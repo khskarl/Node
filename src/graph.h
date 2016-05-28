@@ -2,6 +2,7 @@
 #define GRAPH_H
 
 #include <vector>
+#include <imgui.h>
 
 #define sizeofArray(t) (sizeof(t) / sizeof(t[0]))
 #define MAX_CONNECTION_COUNT 4
@@ -48,35 +49,8 @@ struct NodeType
 	SlotDesc outputLinks[MAX_CONNECTION_COUNT];
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct NodeType s_nodeTypes[] =
-{
-	{
-		"Blend",
-		// Input connections
-		{
-			{ "Input1", SlotType::Color },
-			{ "Input2", SlotType::Color },
-		},
-		// Output
-		{
-			{ "Out", SlotType::Color },
-		},
-	},
-
-	{
-		"Threshold",
-		// Input connections
-		{
-			{ "Input1", SlotType::Color },
-		},
-		// Output
-		{
-			{ "Out", SlotType::Color },
-		},
-	},
-};
+extern struct NodeType s_nodeTypes[2];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

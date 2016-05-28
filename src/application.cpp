@@ -1,11 +1,11 @@
 #include "application.h"
-#include "graph_drawing_utils.h"
 
 #include <iostream>
 
-
 #include "settings.h"
-
+#include "graph_drawing_utils.h"
+#include "node_types.h"
+#include "graph.h"
 
 using std::cout;
 
@@ -44,8 +44,8 @@ static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
 
 	// Set slots positions
 	{
-		float dx = Settings::NodeSize.y / node->inputLinks.size();
 		float slotHeight = 0;
+		float dx = Settings::NodeSize.y / node->inputLinks.size();
 		for (Link* link : node->inputLinks)
 		{
 			link->pos = ImVec2(0.0f, slotHeight + dx / 2.f);
@@ -57,7 +57,7 @@ static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
 	node->size.x = Settings::NodeSize.x;	
 	node->size.y = Settings::NodeSize.y;
 
-	// set the positions for the output nodes when we know where the place them
+	// set the positions for the output nodes
 	for (Link* l : node->outputLinks)
 	{		
 		l->pos = ImVec2(node->size.x, node->size.y / 2.f);
@@ -247,8 +247,8 @@ void DrawLinks(ImDrawList* drawList, ImVec2 offset)
 				continue;
 
 			DrawHermite(drawList, 
-				offset + targetNode->pos + con->input->pos, 
-				offset + node->pos + con->pos);
+						offset + targetNode->pos + con->input->pos, 
+						offset + node->pos + con->pos);
 		}
 	}
 }

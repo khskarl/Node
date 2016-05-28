@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "graph.h"
 #include "settings.h"
 
 
@@ -12,7 +13,7 @@ void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 	ImVec2 t2 = ImVec2(160.0f, 0.0f);
 
 	float dx = 1.f/STEPS;
-	for (int step = 0; step <= STEPS; step++)
+	for (int step = 0; step <= STEPS; ++step)
 	{
 		float t = dx * step;
 		float h1 = +2*t*t*t - 3*t*t + 1.0f;
