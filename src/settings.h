@@ -23,6 +23,8 @@ const ImColor SlotColor(150, 150, 150);
 
 const ImColor LinkColor(220, 220, 220);
 
+const ImColor BackgroundColor(20, 20, 20, 255);
+
 }
 
 #endif // SETTINGS_H

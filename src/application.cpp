@@ -260,11 +260,11 @@ Application::Application() {
 
 void Application::Init() {
 	std::cout << "LADSDASDASDOL";
-	// Node* node = CreateNodeFromType(ImVec2(10, 30), &s_nodeTypes[0]);
-	// s_nodes.push_back(node);
+	Node* node = CreateNodeFromType(ImVec2(100, 200), &s_nodeTypes[0]);
+	s_nodes.push_back(node);
 
-	// node = CreateNodeFromType(ImVec2(10, 30), &s_nodeTypes[0]);
-	// s_nodes.push_back(node);
+	node = CreateNodeFromType(ImVec2(600, 200), &s_nodeTypes[1]);
+	s_nodes.push_back(node);
 }
 
 
@@ -289,18 +289,21 @@ void Application::ShowGraphEditor()
 	//ImGui::Text("Hold middle mouse button to scroll (%.2f,%.2f)", scrolling.x, scrolling.y);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImColor(40, 40, 40, 255));
-	ImGui::BeginChild("scrolling_region", ImVec2(0,0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
+	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, Settings::BackgroundColor);
+	ImGui::BeginChild("scroll_region", 
+					  ImVec2(0,0), 
+					  true, 
+					  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
 	ImGui::PushItemWidth(120.0f);
 
 
-	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 	for (Node* node : s_nodes)
-		DrawNode(draw_list, scrolling, node, node_selected);
+		DrawNode(drawList, scrolling, node, node_selected);
 
 	updateDraging(scrolling);
-	DrawLinks(draw_list, scrolling);
+	DrawLinks(drawList, scrolling);
 
 	// Open context menu
 	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))

@@ -17,15 +17,16 @@ static void error_callback(int error, const char* description)
 }
 
 
-
 ImVec4 gClearColor = ImColor(85, 101, 107);
 
 int main(int, char**)
 {
 	// Setup window
 	glfwSetErrorCallback(error_callback);
+	
 	if (!glfwInit())
 		return 1;
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -39,7 +40,7 @@ int main(int, char**)
 
 	Application app;
 	app.Init();
-	bool isGraphEditorOpen = true;
+
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -53,7 +54,10 @@ int main(int, char**)
 		int displayW, displayH;
 		glfwGetFramebufferSize(window, &displayW, &displayH);
 		glViewport(0, 0, displayW, displayH);
-		glClearColor(gClearColor.x, gClearColor.y, gClearColor.z, gClearColor.w);
+		glClearColor(gClearColor.x, 
+					 gClearColor.y, 
+					 gClearColor.z, 
+					 gClearColor.w);
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui::Render();
 		glfwSwapBuffers(window);

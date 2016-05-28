@@ -1,8 +1,4 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef NODE_TYPES_H
+#define NODE_TYPES_H
 
-#include "graph.h"
-
-
-
-#endif // GRAPH_H
+#endif // NODE_TYPES_H
