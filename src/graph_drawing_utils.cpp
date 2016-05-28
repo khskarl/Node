@@ -2,13 +2,12 @@
 
 #include <vector>
 
-const float NODE_SLOT_RADIUS = 6.0f;
-const ImVec2 NODE_WINDOW_PADDING(8.0f, 8.0f);
-const float SLOTS_SPACING = 4.0f;
+#include "settings.h"
+
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 {
-	int STEPS = 12;
+	int STEPS = 16;
 	ImVec2 t1 = ImVec2(160.0f, 0.0f);
 	ImVec2 t2 = ImVec2(160.0f, 0.0f);
 
@@ -20,11 +19,33 @@ void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 		float h2 = -2*t*t*t + 3*t*t;
 		float h3 =    t*t*t - 2*t*t + t;
 		float h4 =    t*t*t -   t*t;
-		drawList->PathLineTo(ImVec2(h1 * p1.x + h2 * p2.x + h3 * t1.x + h4 * t2.x, 
-									h1 * p1.y + h2 * p2.y + h3 * t1.y + h4 * t2.y));
+
+		float x = h1 * p1.x + h2 * p2.x + h3 * t1.x + h4 * t2.x;
+		float y = h1 * p1.y + h2 * p2.y + h3 * t1.y + h4 * t2.y;
+		
+		drawList->PathLineTo(ImVec2(x, y));
 	}
 
-	drawList->PathStroke(ImColor(200,200,100), false, 3.0f);
+	drawList->PathStroke(Settings::LinkColor, false, 3.0f);
+}
+
+void DrawSlots(ImDrawList* drawList, ImVec2 offset, Node* node)
+{
+
+}
+
+
+bool IsSlotHovered(Connection* c, ImVec2 offset)
+{
+	ImVec2 mousePos = ImGui::GetIO().MousePos;
+	ImVec2 conPos = offset + c->pos;
+
+	float xd = mousePos.x - conPos.x;
+	float yd = mousePos.y - conPos.y;
+
+	float distance = (xd * xd) + (yd * yd);
+	float radius = Settings::SlotRadius;
+	return distance < (radius * radius); 
 }
 
 
@@ -42,11 +63,11 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	// Draw title in center
 	ImVec2 textSize = ImGui::CalcTextSize(node->name);
 
-	ImVec2 node_rect_min = offset + node->pos;
-	ImVec2 node_rect_max = node_rect_min + node->size;
+	ImVec2 rectMin = offset + node->pos;
+	ImVec2 rectMax = rectMin + node->size;
 	
-	ImVec2 pos = node_rect_min + NODE_WINDOW_PADDING;
-	pos.x = node_rect_min.x + (node->size.x / 2) - textSize.x / 2;
+	ImVec2 pos = rectMin + Settings::NodeWindowPadding;
+	pos.x = rectMin.x + (node->size.x / 2) - textSize.x / 2;
 	ImGui::SetCursorScreenPos(pos);
 	ImGui::Text("%s", node->name);
 
@@ -56,7 +77,7 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	// Display node box
 	drawList->ChannelsSetCurrent(0); // Background
 
-	ImGui::SetCursorScreenPos(node_rect_min);
+	ImGui::SetCursorScreenPos(rectMin);
 	ImGui::InvisibleButton("node", node->size);
 
 	if (ImGui::IsItemHovered())
@@ -70,17 +91,23 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	if (ImGui::IsItemActive() /*&& !s_dragNode.con*/)
 		node_moving_active = true;
 
-	ImU32 node_bg_color = node_hovered_in_scene == node->id ? ImColor(75,75,75) : ImColor(60,60,60);
-	drawList->AddRectFilled(node_rect_min, node_rect_max, node_bg_color, 4.0f); 
+	ImU32 backgroundColor = Settings::NodeBgColor;
 
-	ImVec2 titleArea = node_rect_max;
-	titleArea.y = node_rect_min.y + 30.0f;
+	if (node_hovered_in_scene == node->id) 
+		backgroundColor = Settings::NodeBgHighlightColor;
+	
+	drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f); 
+
+	ImVec2 titleArea = rectMax;
+	titleArea.y = rectMin.y + 30.0f;
 
 	// Draw text bg area
-	drawList->AddRectFilled(node_rect_min + ImVec2(1,1), titleArea, ImColor(100,0,0), 4.0f); 
-	drawList->AddRect(node_rect_min, node_rect_max, ImColor(100,100,100), 4.0f); 
+	drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40), 4.0f); 
+	
+	// Draw border of the node
+	drawList->AddRect(rectMin, rectMax, Settings::NodeBorderColor, 4.0f); 
 
-	offset = node_rect_min;
+	offset = rectMin;
 
 	offset.y += 40.0f;
 
@@ -89,17 +116,19 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	{
 		ImGui::SetCursorScreenPos(offset + ImVec2(10.0f, 0));
 
-		ImColor slotColor = ImColor(150, 150, 150);
+		ImColor slotColor = Settings::NodeColor;
 
-		// if (IsSlotHovered(slot, node_rect_min))
+		// if (IsSlotHovered(slot, rectMin))
 		// 	slotColor = ImColor(200, 200, 200);
 
-		drawList->AddCircleFilled(node_rect_min + slot->pos, NODE_SLOT_RADIUS, slotColor); 
+		drawList->AddCircleFilled(rectMin + slot->pos, 
+								  Settings::SlotRadius, 
+								  slotColor); 
 
 		offset.y += textSize.y + 2.0f;
 	}
 
-	offset = node_rect_min;
+	offset = rectMin;
 	offset.y += 40.0f;
 
 	for (Connection* con : node->outputConnections)
@@ -108,12 +137,12 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 
 		ImGui::SetCursorScreenPos(offset + ImVec2(con->pos.x - (textSize.x + 10.0f), 0));
 
-		ImColor conColor = ImColor(150, 150, 150);
+		ImColor conColor = Settings::SlotColor;
 
-		// if (IsSlotHovered(con, node_rect_min))
+		// if (IsSlotHovered(con, rectMin))
 		// 	conColor = ImColor(200, 200, 200);
 
-		drawList->AddCircleFilled(node_rect_min + con->pos, NODE_SLOT_RADIUS, conColor); 
+		drawList->AddCircleFilled(rectMin + con->pos, Settings::SlotRadius, conColor); 
 
 		offset.y += textSize.y + 2.0f;
 	}

@@ -2,10 +2,6 @@
 #include "graph_drawing_utils.h"
 
 
-const float NODE_SLOT_RADIUS = 6.0f;
-const ImVec2 NODE_WINDOW_PADDING(8.0f, 8.0f);
-const float SLOTS_SPACING = 4.0f;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 uint32_t s_id = 0;
@@ -56,7 +52,7 @@ static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
 		c->pos = ImVec2(0.0f, titleSize.y + inputTextSize.y + textSize.y / 2.0f);
 
 		inputTextSize.y += textSize.y;
-		inputTextSize.y += SLOTS_SPACING; // space between text entries
+		inputTextSize.y += 4.0f; // space between text entries
 	}
 
 	// inputTextSize.x += 40.0f;
@@ -87,7 +83,7 @@ static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
 		c->pos = ImVec2(node->size.x, titleSize.y + inputTextSize.y + textSize.y / 2.0f);
 
 		inputTextSize.y += textSize.y;
-		inputTextSize.y += SLOTS_SPACING; // space between text entries
+		inputTextSize.y += 4.0f; // space between text entries
 	}
 
 	// calculate the size of the node depending on number of connections
@@ -118,19 +114,6 @@ static DragNode s_dragNode;
 static DragState s_dragState = DragState::Default;
 
 static std::vector<Node*> s_nodes;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static bool IsSlotHovered(Connection* c, ImVec2 offset)
-{
-	ImVec2 mousePos = ImGui::GetIO().MousePos;
-	ImVec2 conPos = offset + c->pos;
-
-	float xd = mousePos.x - conPos.x;
-	float yd = mousePos.y - conPos.y;
-
-	return ((xd * xd) + (yd *yd)) < (NODE_SLOT_RADIUS * NODE_SLOT_RADIUS); 
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

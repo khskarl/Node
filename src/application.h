@@ -7,8 +7,6 @@
 #include <imgui.h>
 #include "imgui_dock.h"
 
-
-
 class Application {
 private:
 	bool _isGraphEditorOpen;

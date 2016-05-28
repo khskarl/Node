@@ -9,7 +9,6 @@
 enum SlotType 
 {
 	Color,
-	Vec3,
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +32,7 @@ struct Connection
 		input = 0;
 	}
 
-	float v3[3];
+	float color[4];
 
 	struct Connection* input;
 	std::vector<Connection*> output;
