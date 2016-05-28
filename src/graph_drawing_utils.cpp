@@ -35,7 +35,7 @@ void DrawSlots(ImDrawList* drawList, ImVec2 offset, Node* node)
 }
 
 
-bool IsSlotHovered(Connection* c, ImVec2 offset)
+bool IsSlotHovered(Link* c, ImVec2 offset)
 {
 	ImVec2 mousePos = ImGui::GetIO().MousePos;
 	ImVec2 conPos = offset + c->pos;
@@ -51,41 +51,29 @@ bool IsSlotHovered(Connection* c, ImVec2 offset)
 
 void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selected)
 {
-	int node_hovered_in_scene = -1;
-	bool open_context_menu = false;
+	int hoveredNodeID = -1;
 
 	ImGui::PushID(node->id);
 
 	// Display node contents first
-	drawList->ChannelsSetCurrent(1); // Foreground
 	bool old_any_active = ImGui::IsAnyItemActive();
 
-	// Draw title in center
+	// Compute useful size and positions
 	ImVec2 textSize = ImGui::CalcTextSize(node->name);
 
 	ImVec2 rectMin = offset + node->pos;
-	ImVec2 rectMax = rectMin + node->size;
-	
-	ImVec2 pos = rectMin + Settings::NodeWindowPadding;
-	pos.x = rectMin.x + (node->size.x / 2) - textSize.x / 2;
-	ImGui::SetCursorScreenPos(pos);
-	ImGui::Text("%s", node->name);
-
+	ImVec2 rectMax = rectMin + Settings::NodeSize;
+		
 	// Save the size of what we have emitted and weither any of the widgets are being used
 	bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
 	
 	// Display node box
-	drawList->ChannelsSetCurrent(0); // Background
-
 	ImGui::SetCursorScreenPos(rectMin);
-	ImGui::InvisibleButton("node", node->size);
+	ImGui::InvisibleButton("node", Settings::NodeSize);
 
 	if (ImGui::IsItemHovered())
-	{
-		node_hovered_in_scene = node->id;
-		open_context_menu |= ImGui::IsMouseClicked(1);
-	}
-
+		hoveredNodeID = node->id;
+	
 	bool node_moving_active = false;
 	
 	if (ImGui::IsItemActive() /*&& !s_dragNode.con*/)
@@ -93,26 +81,33 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 
 	ImU32 backgroundColor = Settings::NodeBgColor;
 
-	if (node_hovered_in_scene == node->id) 
+	if (hoveredNodeID == node->id) 
 		backgroundColor = Settings::NodeBgHighlightColor;
 	
-	drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f); 
 
 	ImVec2 titleArea = rectMax;
-	titleArea.y = rectMin.y + 30.0f;
+	titleArea.y = rectMin.y + 25.0f;
 
-	// Draw text bg area
-	drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40), 4.0f); 
-	
 	// Draw border of the node
-	drawList->AddRect(rectMin, rectMax, Settings::NodeBorderColor, 4.0f); 
+	{	
+		ImVec2 borderRectMin = rectMin - ImVec2(4, 4);
+		ImVec2 borderRectMax = rectMax + ImVec2(4, 4);
+		
+		drawList->AddRectFilled(borderRectMin, 
+						  		borderRectMax, 
+						  		Settings::NodeBorderColor, 
+						  		4.0f); 
+	}
 
+	// Draw NodeBackground
+	drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f); 
+
+	
 	offset = rectMin;
-
 	offset.y += 40.0f;
 
 	// Draw connection Slots
-	for (Connection* slot : node->inputConnections)
+	for (Link* slot : node->inputLinks)
 	{
 		ImGui::SetCursorScreenPos(offset + ImVec2(10.0f, 0));
 
@@ -131,24 +126,38 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	offset = rectMin;
 	offset.y += 40.0f;
 
-	for (Connection* con : node->outputConnections)
+	for (Link* con : node->outputLinks)
 	{
 		textSize = ImGui::CalcTextSize(con->desc.name);
 
 		ImGui::SetCursorScreenPos(offset + ImVec2(con->pos.x - (textSize.x + 10.0f), 0));
 
-		ImColor conColor = Settings::SlotColor;
-
+		ImColor slotColor = Settings::SlotColor;
+		float slotRadius = Settings::SlotRadius;
 		// if (IsSlotHovered(con, rectMin))
-		// 	conColor = ImColor(200, 200, 200);
+		// 	slotColor = ImColor(200, 200, 200);
 
-		drawList->AddCircleFilled(rectMin + con->pos, Settings::SlotRadius, conColor); 
+		drawList->AddCircleFilled(rectMin + con->pos, 
+								  slotRadius, 
+								  slotColor); 
 
 		offset.y += textSize.y + 2.0f;
 	}
 
 
-	//for (int i = 0; i < node->outputConnections.size(); ++i)
+	// Draw title background
+	drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40), 4.0f); 
+	
+	// Draw title
+	{
+		ImVec2 pos = rectMin + Settings::NodeWindowPadding;
+		pos.x = rectMin.x + (Settings::NodeSize.x / 2) - textSize.x / 2;
+		ImGui::SetCursorScreenPos(pos);
+		ImGui::Text("%s", node->name);
+	}
+
+
+	//for (int i = 0; i < node->outputLinks.size(); ++i)
 	//	drawList->AddCircleFilled(offset + node->outputSlotPos(i), NODE_SLOT_RADIUS, ImColor(150,150,150,150));
 
 	if (node_widgets_active || node_moving_active)

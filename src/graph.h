@@ -21,12 +21,12 @@ struct SlotDesc
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct Connection
+struct Link
 {
 	ImVec2 pos;
 	SlotDesc desc;
 
-	inline Connection()
+	inline Link()
 	{
 		pos.x = pos.y = 0.0f;
 		input = 0;
@@ -34,8 +34,8 @@ struct Connection
 
 	float color[4];
 
-	struct Connection* input;
-	std::vector<Connection*> output;
+	Link* input;
+	std::vector<Link*> output;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,13 +44,13 @@ struct Connection
 struct NodeType
 {
 	const char* name;
-	SlotDesc inputConnections[MAX_CONNECTION_COUNT];
-	SlotDesc outputConnections[MAX_CONNECTION_COUNT];
+	SlotDesc inputLinks[MAX_CONNECTION_COUNT];
+	SlotDesc outputLinks[MAX_CONNECTION_COUNT];
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static struct NodeType s_nodeTypes[] =
+struct NodeType s_nodeTypes[] =
 {
 	{
 		"Blend",
@@ -86,8 +86,8 @@ struct Node
 	ImVec2 size;
 	int id;
 	const char* name;
-	std::vector<Connection*> inputConnections;
-	std::vector<Connection*> outputConnections;
+	std::vector<Link*> inputLinks;
+	std::vector<Link*> outputLinks;
 };
 
 #endif // GRAPH_H

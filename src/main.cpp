@@ -38,6 +38,7 @@ int main(int, char**)
 	ImGui_ImplGlfwGL3_Init(window, true);
 
 	Application app;
+	app.Init();
 	bool isGraphEditorOpen = true;
 	// Main loop
 	while (!glfwWindowShouldClose(window))

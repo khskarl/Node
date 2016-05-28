@@ -1,6 +1,13 @@
 #include "application.h"
 #include "graph_drawing_utils.h"
 
+#include <iostream>
+
+
+#include "settings.h"
+
+
+using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8,7 +15,7 @@ uint32_t s_id = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void SetupSlots(std::vector<Connection*>& connections, SlotDesc* connectionDescs)
+static void SetupSlots(std::vector<Link*>& connections, SlotDesc* connectionDescs)
 {
 	for (int i = 0; i < MAX_CONNECTION_COUNT; ++i)
 	{
@@ -17,7 +24,7 @@ static void SetupSlots(std::vector<Connection*>& connections, SlotDesc* connecti
 		if (!desc.name)
 			break;
 
-		Connection* con = new Connection;
+		Link* con = new Link;
 		con->desc = desc;
 
 		connections.push_back(con);
@@ -29,64 +36,32 @@ static void SetupSlots(std::vector<Connection*>& connections, SlotDesc* connecti
 static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
 {
 	Node* node = new Node;
-	node->id = s_id++;
+	node->id   = s_id++;
 	node->name = nodeType->name;
 
-	ImVec2 titleSize = ImGui::CalcTextSize(node->name);
+	SetupSlots(node->inputLinks, nodeType->inputLinks);
+	SetupSlots(node->outputLinks, nodeType->outputLinks);
 
-	titleSize.y *= 2.5f;
-
-	SetupSlots(node->inputConnections, nodeType->inputConnections);
-	SetupSlots(node->outputConnections, nodeType->outputConnections);
-
-	// Calculate the size needed for the whole box
-
-	ImVec2 inputTextSize(0.0f, 0.0f);
-	ImVec2 outputText(0.0f, 0.0f);
-
-	for (Connection* c : node->inputConnections)
+	// Set slots positions
 	{
-		ImVec2 textSize = ImGui::CalcTextSize(c->desc.name);
-		inputTextSize.x = std::max<float>(textSize.x, inputTextSize.x);
-
-		c->pos = ImVec2(0.0f, titleSize.y + inputTextSize.y + textSize.y / 2.0f);
-
-		inputTextSize.y += textSize.y;
-		inputTextSize.y += 4.0f; // space between text entries
-	}
-
-	// inputTextSize.x += 40.0f;
-	inputTextSize.x = 100.0f;
-	inputTextSize.y = 100.0f;
-
-	float xStart = inputTextSize.x;
-
-	// Calculate for the outputs
-
-	for (Connection* c : node->outputConnections)
-	{
-		ImVec2 textSize = ImGui::CalcTextSize(c->desc.name);
-		inputTextSize.x = std::max<float>(xStart + textSize.x, inputTextSize.x);
+		float dx = Settings::NodeSize.y / node->inputLinks.size();
+		float slotHeight = 0;
+		for (Link* link : node->inputLinks)
+		{
+			link->pos = ImVec2(0.0f, slotHeight + dx / 2.f);
+			slotHeight += dx;
+		}
 	}
 
 	node->pos = pos;
-	node->size.x = inputTextSize.x;	
-	node->size.y = inputTextSize.y + titleSize.y;
-
-	inputTextSize.y = 0.0f;
+	node->size.x = Settings::NodeSize.x;	
+	node->size.y = Settings::NodeSize.y;
 
 	// set the positions for the output nodes when we know where the place them
-
-	for (Connection* c : node->outputConnections)
+	for (Link* l : node->outputLinks)
 	{		
-		ImVec2 textSize = ImGui::CalcTextSize(c->desc.name);
-		c->pos = ImVec2(node->size.x, titleSize.y + inputTextSize.y + textSize.y / 2.0f);
-
-		inputTextSize.y += textSize.y;
-		inputTextSize.y += 4.0f; // space between text entries
+		l->pos = ImVec2(node->size.x, node->size.y / 2.f);
 	}
-
-	// calculate the size of the node depending on number of connections
 
 	return node;
 }
@@ -107,7 +82,7 @@ enum DragState
 struct DragNode
 {
 	ImVec2 pos;
-	Connection* con;
+	Link* con;
 };
 
 static DragNode s_dragNode;
@@ -117,13 +92,13 @@ static std::vector<Node*> s_nodes;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static Connection* getHoverCon(ImVec2 offset, ImVec2* pos)
+static Link* getHoverCon(ImVec2 offset, ImVec2* pos)
 {
 	for (Node* node : s_nodes)
 	{
 		ImVec2 nodePos = node->pos + offset;
 
-		for (Connection* con : node->inputConnections)
+		for (Link* con : node->inputLinks)
 		{
 			if (IsSlotHovered(con, nodePos))
 			{
@@ -132,7 +107,7 @@ static Connection* getHoverCon(ImVec2 offset, ImVec2* pos)
 			}
 		}
 
-		for (Connection* con : node->outputConnections)
+		for (Link* con : node->outputLinks)
 		{
 			if (IsSlotHovered(con, nodePos))
 			{
@@ -155,7 +130,7 @@ void updateDraging(ImVec2 offset)
 		case Default:
 		{
 			ImVec2 pos;
-			Connection* con = getHoverCon(offset, &pos);
+			Link* con = getHoverCon(offset, &pos);
 
 			if (con)
 			{
@@ -170,7 +145,7 @@ void updateDraging(ImVec2 offset)
 		case Hover:
 		{
 			ImVec2 pos;
-			Connection* con = getHoverCon(offset, &pos);
+			Link* con = getHoverCon(offset, &pos);
 
 			// Make sure we are still hovering the same node
 
@@ -204,7 +179,7 @@ void updateDraging(ImVec2 offset)
 			if (!ImGui::IsMouseDown(0))
 			{
 				ImVec2 pos;
-				Connection* con = getHoverCon(offset, &pos);
+				Link* con = getHoverCon(offset, &pos);
 
 				// Make sure we are still hovering the same node
 
@@ -235,17 +210,17 @@ void updateDraging(ImVec2 offset)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Node* findNodeByCon(Connection* findCon)
+Node* findNodeByCon(Link* findCon)
 {
 	for (Node* node : s_nodes)
 	{
-		for (Connection* con : node->inputConnections)
+		for (Link* con : node->inputLinks)
 		{
 			if (con == findCon)
 				return node;
 		}
 
-		for (Connection* con : node->outputConnections)
+		for (Link* con : node->outputLinks)
 		{
 			if (con == findCon)
 				return node;
@@ -257,11 +232,11 @@ Node* findNodeByCon(Connection* findCon)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DrawConnections(ImDrawList* drawList, ImVec2 offset)
+void DrawLinks(ImDrawList* drawList, ImVec2 offset)
 {
 	for (Node* node : s_nodes)
 	{
-		for (Connection* con : node->inputConnections)
+		for (Link* con : node->inputLinks)
 		{
 			if (!con->input)
 				continue;
@@ -277,6 +252,21 @@ void DrawConnections(ImDrawList* drawList, ImVec2 offset)
 		}
 	}
 }
+///////////////////
+
+Application::Application() {
+
+}
+
+void Application::Init() {
+	std::cout << "LADSDASDASDOL";
+	// Node* node = CreateNodeFromType(ImVec2(10, 30), &s_nodeTypes[0]);
+	// s_nodes.push_back(node);
+
+	// node = CreateNodeFromType(ImVec2(10, 30), &s_nodeTypes[0]);
+	// s_nodes.push_back(node);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -305,15 +295,12 @@ void Application::ShowGraphEditor()
 
 
 	ImDrawList* draw_list = ImGui::GetWindowDrawList();
-	draw_list->ChannelsSplit(2);
 
 	for (Node* node : s_nodes)
 		DrawNode(draw_list, scrolling, node, node_selected);
 
 	updateDraging(scrolling);
-	DrawConnections(draw_list, scrolling);
-
-	draw_list->ChannelsMerge();
+	DrawLinks(draw_list, scrolling);
 
 	// Open context menu
 	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))

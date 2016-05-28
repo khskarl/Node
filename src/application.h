@@ -12,6 +12,8 @@ private:
 	bool _isGraphEditorOpen;
 	void ShowGraphEditor();
 public:
+	Application();
+	void Init();
 	void Show();
 };
 
