@@ -4,7 +4,7 @@
 
 #include "settings.h"
 #include "graph_drawing_utils.h"
-#include "node_types.h"
+
 #include "graph.h"
 
 using std::cout;
@@ -15,53 +15,54 @@ uint32_t s_id = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void SetupSlots(std::vector<Link*>& connections, SlotDesc* connectionDescs)
+static void SetupSlots(std::vector<Link*>& connections/*, SlotDesc* connectionDescs*/)
 {
-	for (int i = 0; i < MAX_CONNECTION_COUNT; ++i)
-	{
-		const SlotDesc& desc = connectionDescs[i];
+	// for (int i = 0; i < MAX_CONNECTION_COUNT; ++i)
+	// {
+	// 	const SlotDesc& desc = connectionDescs[i];
 
-		if (!desc.name)
-			break;
+	// 	if (!desc.name)
+	// 		break;
 
-		Link* con = new Link;
-		con->desc = desc;
+	// 	Slot* slot = new Slot;
+	// 	slot->desc = desc;
 
-		connections.push_back(con);
-	}
+	// 	connections.push_back(con);
+	// }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
 {
-	Node* node = new Node;
+	Node* node = new Node(pos);
 	node->id   = s_id++;
 	node->name = nodeType->name;
 
-	SetupSlots(node->inputLinks, nodeType->inputLinks);
-	SetupSlots(node->outputLinks, nodeType->outputLinks);
+	// SetupSlots(node->inputLinks, nodeType->inputLinks);
+	// SetupSlots(node->outputLinks, nodeType->outputLinks);
 
 	// Set slots positions
 	{
 		float slotHeight = 0;
-		float dx = Settings::NodeSize.y / node->inputLinks.size();
-		for (Link* link : node->inputLinks)
+		float dx = Settings::NodeSize.y / node->inputs.size();
+		for (Slot& slot : node->inputs)
 		{
-			link->pos = ImVec2(0.0f, slotHeight + dx / 2.f);
+			slot.pos = ImVec2(0.0f, slotHeight + dx / 2.f);
 			slotHeight += dx;
 		}
 	}
 
 	node->pos = pos;
-	node->size.x = Settings::NodeSize.x;	
-	node->size.y = Settings::NodeSize.y;
+	ImVec2 size;
+	size.x = Settings::NodeSize.x;	
+	size.y = Settings::NodeSize.y / 2.f;
 
 	// set the positions for the output nodes
-	for (Link* l : node->outputLinks)
-	{		
-		l->pos = ImVec2(node->size.x, node->size.y / 2.f);
-	}
+	// for (Slot* l : node->outputLinks)
+	// {		
+	// 	l->pos = ImVec2(size.x, size.y);
+	// }
 
 	return node;
 }
@@ -88,36 +89,34 @@ struct DragNode
 static DragNode s_dragNode;
 static DragState s_dragState = DragState::Default;
 
-static std::vector<Node*> s_nodes;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static Link* getHoverCon(ImVec2 offset, ImVec2* pos)
 {
-	for (Node* node : s_nodes)
-	{
-		ImVec2 nodePos = node->pos + offset;
+	// for (Node* node : s_nodes)
+	// {
+	// 	ImVec2 nodePos = node->pos + offset;
 
-		for (Link* con : node->inputLinks)
-		{
-			if (IsSlotHovered(con, nodePos))
-			{
-				*pos = nodePos + con->pos;
-				return con;
-			}
-		}
+	// 	for (Slot* con : node->input)
+	// 	{
+	// 		if (IsSlotHovered(con, nodePos))
+	// 		{
+	// 			*pos = nodePos + con->pos;
+	// 			return con;
+	// 		}
+	// 	}
 
-		for (Link* con : node->outputLinks)
-		{
-			if (IsSlotHovered(con, nodePos))
-			{
-				*pos = nodePos + con->pos;
-				return con;
-			}
-		}
-	}
+	// 	for (Link* con : node->outputLinks)
+	// 	{
+	// 		if (IsSlotHovered(con, nodePos))
+	// 		{
+	// 			*pos = nodePos + con->pos;
+	// 			return con;
+	// 		}
+	// 	}
+	// }
 	
-	s_dragNode.con = 0;
+	// s_dragNode.con = 0;
 	return 0; 
 }
 
@@ -125,107 +124,107 @@ static Link* getHoverCon(ImVec2 offset, ImVec2* pos)
 
 void updateDraging(ImVec2 offset)
 {
-	switch (s_dragState)
-	{
-		case Default:
-		{
-			ImVec2 pos;
-			Link* con = getHoverCon(offset, &pos);
+	// switch (s_dragState)
+	// {
+	// 	case Default:
+	// 	{
+	// 		ImVec2 pos;
+	// 		Link* con = getHoverCon(offset, &pos);
 
-			if (con)
-			{
-				s_dragNode.con = con;
-				s_dragNode.pos = pos; 
-				s_dragState = Hover;
-			}
+	// 		if (con)
+	// 		{
+	// 			s_dragNode.con = con;
+	// 			s_dragNode.pos = pos; 
+	// 			s_dragState = Hover;
+	// 		}
 				
-			break;
-		}
+	// 		break;
+	// 	}
 
-		case Hover:
-		{
-			ImVec2 pos;
-			Link* con = getHoverCon(offset, &pos);
+	// 	case Hover:
+	// 	{
+	// 		ImVec2 pos;
+	// 		Link* con = getHoverCon(offset, &pos);
 
-			// Make sure we are still hovering the same node
+	// 		// Make sure we are still hovering the same node
 
-			if (con != s_dragNode.con)
-			{
-				s_dragNode.con = 0;
-				s_dragState = Default;
-				return;
-			}
+	// 		if (con != s_dragNode.con)
+	// 		{
+	// 			s_dragNode.con = 0;
+	// 			s_dragState = Default;
+	// 			return;
+	// 		}
 
-			if (ImGui::IsMouseClicked(0) && s_dragNode.con) 
-				s_dragState = Draging;
+	// 		if (ImGui::IsMouseClicked(0) && s_dragNode.con) 
+	// 			s_dragState = Draging;
 
-			break;
-		}
+	// 		break;
+	// 	}
 
-		case BeginDrag:
-		{
-			break;
-		}
+	// 	case BeginDrag:
+	// 	{
+	// 		break;
+	// 	}
 
-		case Draging:
-		{
-			ImDrawList* drawList = ImGui::GetWindowDrawList();
+	// 	case Draging:
+	// 	{
+	// 		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-			drawList->ChannelsSetCurrent(0); // Background
+	// 		drawList->ChannelsSetCurrent(0); // Background
 
-			// Holding connection
-			DrawHermite(drawList, s_dragNode.pos, ImGui::GetIO().MousePos);
+	// 		// Holding connection
+	// 		DrawHermite(drawList, s_dragNode.pos, ImGui::GetIO().MousePos);
 
-			if (!ImGui::IsMouseDown(0))
-			{
-				ImVec2 pos;
-				Link* con = getHoverCon(offset, &pos);
+	// 		if (!ImGui::IsMouseDown(0))
+	// 		{
+	// 			ImVec2 pos;
+	// 			Link* con = getHoverCon(offset, &pos);
 
-				// Make sure we are still hovering the same node
+	// 			// Make sure we are still hovering the same node
 
-				if (con == s_dragNode.con)
-				{
-					s_dragNode.con = 0;
-					s_dragState = Default;
-					return;
-				}
+	// 			if (con == s_dragNode.con)
+	// 			{
+	// 				s_dragNode.con = 0;
+	// 				s_dragState = Default;
+	// 				return;
+	// 			}
 
-				// Lets connect the nodes.
-				// TODO: Make sure we connect stuff in the correct way!
+	// 			// Lets connect the nodes.
+	// 			// TODO: Make sure we connect stuff in the correct way!
 
-				con->input = s_dragNode.con;
-				s_dragNode.con = 0;
-				s_dragState = Default;
-			}
+	// 			scon->input = s_dragNode.con;
+	// 			s_dragNode.con = 0;
+	// 			s_dragState = Default;
+	// 		}
 
-			break;
-		}
+	// 		break;
+	// 	}
 
-		case Connect:
-		{
-			break;
-		}
-	}
+	// 	case Connect:
+	// 	{
+	// 		break;
+	// 	}
+	// }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Node* findNodeByCon(Link* findCon)
 {
-	for (Node* node : s_nodes)
-	{
-		for (Link* con : node->inputLinks)
-		{
-			if (con == findCon)
-				return node;
-		}
+	// for (Node* node : s_nodes)
+	// {
+	// 	for (Link* con : node->inputLinks)
+	// 	{
+	// 		if (con == findCon)
+	// 			return node;
+	// 	}
 
-		for (Link* con : node->outputLinks)
-		{
-			if (con == findCon)
-				return node;
-		}
-	}
+	// 	for (Link* con : node->outputLinks)
+	// 	{
+	// 		if (con == findCon)
+	// 			return node;
+	// 	}
+	// }
 
 	return 0;
 }
@@ -234,23 +233,23 @@ Node* findNodeByCon(Link* findCon)
 
 void DrawLinks(ImDrawList* drawList, ImVec2 offset)
 {
-	for (Node* node : s_nodes)
-	{
-		for (Link* con : node->inputLinks)
-		{
-			if (!con->input)
-				continue;
+	// for (Node* node : s_nodes)
+	// {
+	// 	for (Slot* con : node->input)
+	// 	{
+	// 		if (!con->input)
+	// 			continue;
 
-			Node* targetNode = findNodeByCon(con->input);
+	// 		Node* targetNode = findNodeByCon(con->input);
 
-			if (!targetNode)
-				continue;
+	// 		if (!targetNode)
+	// 			continue;
 
-			DrawHermite(drawList, 
-						offset + targetNode->pos + con->input->pos, 
-						offset + node->pos + con->pos);
-		}
-	}
+	// 		DrawHermite(drawList, 
+	// 					offset + targetNode->pos + con->input->pos, 
+	// 					offset + node->pos + con->pos);
+	// 	}
+	// }
 }
 ///////////////////
 
@@ -259,12 +258,13 @@ Application::Application() {
 }
 
 void Application::Init() {
-	std::cout << "LADSDASDASDOL";
-	Node* node = CreateNodeFromType(ImVec2(100, 200), &s_nodeTypes[0]);
-	s_nodes.push_back(node);
+	Node* node = CreateNodeFromType(ImVec2(100, 200), &gNodeTypes[0]);
+	_graph.AddNode(ImVec2(100, 200), &gNodeTypes[0]);
+	// s_nodes.push_back(node);
 
-	node = CreateNodeFromType(ImVec2(600, 200), &s_nodeTypes[1]);
-	s_nodes.push_back(node);
+	node = CreateNodeFromType(ImVec2(600, 200), &gNodeTypes[1]);
+	_graph.AddNode(ImVec2(600, 200), &gNodeTypes[1]);
+	// s_nodes.push_back(node);
 }
 
 
@@ -299,11 +299,12 @@ void Application::ShowGraphEditor()
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-	for (Node* node : s_nodes)
+	std::vector<Node*> nodes = _graph.GetNodeData();
+	for (Node * node : nodes)
 		DrawNode(drawList, scrolling, node, node_selected);
 
-	updateDraging(scrolling);
-	DrawLinks(drawList, scrolling);
+	// updateDraging(scrolling);
+	// DrawLinks(drawList, scrolling);
 
 	// Open context menu
 	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))
@@ -321,22 +322,22 @@ void Application::ShowGraphEditor()
 	}
 
 	// Draw context menu
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
-	if (ImGui::BeginPopup("context_menu"))
-	{
+	// ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
+	// if (ImGui::BeginPopup("context_menu"))
+	// {
 
-		for (int i = 0; i < (int)sizeofArray(s_nodeTypes); ++i)
-		{
-			if (ImGui::MenuItem(s_nodeTypes[i].name))
-			{
-				Node* node = CreateNodeFromType(ImGui::GetIO().MousePos, &s_nodeTypes[i]);
-				s_nodes.push_back(node);
-			}
-		}
+	// 	for (int i = 0; i < (int)sizeofArray(s_nodeTypes); ++i)
+	// 	{
+	// 		if (ImGui::MenuItem(s_nodeTypes[i].name))
+	// 		{
+	// 			Node* node = CreateNodeFromType(ImGui::GetIO().MousePos, &s_nodeTypes[i]);
+	// 			s_nodes.push_back(node);
+	// 		}
+	// 	}
 
-		ImGui::EndPopup();
-	}
-	ImGui::PopStyleVar();
+	// 	ImGui::EndPopup();
+	// }
+	// ImGui::PopStyleVar();
 
 	// Scrolling
 	if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(2, 0.0f))

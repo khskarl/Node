@@ -6,11 +6,14 @@
 
 #include <imgui.h>
 #include "imgui_dock.h"
+#include "graph.h"
 
 class Application {
 private:
 	bool _isGraphEditorOpen;
 	void ShowGraphEditor();
+
+	Graph _graph;
 public:
 	Application();
 	void Init();

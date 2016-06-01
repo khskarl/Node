@@ -35,14 +35,14 @@ void DrawSlots(ImDrawList* drawList, ImVec2 offset, Node* node)
 
 }
 
-
-bool IsSlotHovered(Link* c, ImVec2 offset)
+// Shouldn't be here
+bool IsSlotHovered(Slot* slot, ImVec2 offset)
 {
 	ImVec2 mousePos = ImGui::GetIO().MousePos;
-	ImVec2 conPos = offset + c->pos;
+	ImVec2 slotPos = offset + slot->pos;
 
-	float xd = mousePos.x - conPos.x;
-	float yd = mousePos.y - conPos.y;
+	float xd = mousePos.x - slotPos.x;
+	float yd = mousePos.y - slotPos.y;
 
 	float distance = (xd * xd) + (yd * yd);
 	float radius = Settings::SlotRadius;
@@ -108,7 +108,7 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	offset.y += 40.0f;
 
 	// Draw connection Slots
-	for (Link* slot : node->inputLinks)
+	for (Slot* slot : node->inputs)
 	{
 		ImGui::SetCursorScreenPos(offset + ImVec2(10.0f, 0));
 
@@ -127,23 +127,24 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	offset = rectMin;
 	offset.y += 40.0f;
 
-	for (Link* con : node->outputLinks)
-	{
-		textSize = ImGui::CalcTextSize(con->desc.name);
+	// Output rendering
+	// for (Slot* slot : node->output)
+	// {
+	// 	textSize = ImGui::CalcTextSize(con->desc.name);
 
-		ImGui::SetCursorScreenPos(offset + ImVec2(con->pos.x - (textSize.x + 10.0f), 0));
+	// 	ImGui::SetCursorScreenPos(offset + ImVec2(con->pos.x - (textSize.x + 10.0f), 0));
 
-		ImColor slotColor = Settings::SlotColor;
-		float slotRadius = Settings::SlotRadius;
-		// if (IsSlotHovered(con, rectMin))
-		// 	slotColor = ImColor(200, 200, 200);
+	// 	ImColor slotColor = Settings::SlotColor;
+	// 	float slotRadius = Settings::SlotRadius;
+	// 	// if (IsSlotHovered(con, rectMin))
+	// 	// 	slotColor = ImColor(200, 200, 200);
 
-		drawList->AddCircleFilled(rectMin + con->pos, 
-								  slotRadius, 
-								  slotColor); 
+	// 	drawList->AddCircleFilled(rectMin + con->pos, 
+	// 							  slotRadius, 
+	// 							  slotColor); 
 
-		offset.y += textSize.y + 2.0f;
-	}
+	// 	offset.y += textSize.y + 2.0f;
+	// }
 
 
 	// Draw title background

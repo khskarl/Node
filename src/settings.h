@@ -3,9 +3,12 @@
 
 #include <imgui.h>
 
+#define MAX_INPUT_COUNT 4
+
 namespace Settings {
 
 const float SlotRadius = 6.0f;
+
 const float SlotsSpacing = 4.0f;
 
 const float NodeBorderSize = 4.0f;

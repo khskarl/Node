@@ -1,29 +1,9 @@
 #include "graph.h"
 
-struct NodeType s_nodeTypes[] =
-{
-	{
-		"Blend",
-		// Input connections
-		{
-			{ "Input1", SlotType::Color },
-			{ "Input2", SlotType::Color },
-		},
-		// Output
-		{
-			{ "Out", SlotType::Color },
-		},
-	},
+void Graph::AddNode(ImVec2 pPos, NodeType *pType) {
 
-	{
-		"Threshold",
-		// Input connections
-		{
-			{ "Input1", SlotType::Color },
-		},
-		// Output
-		{
-			{ "Out", SlotType::Color },
-		},
-	},
-};
+}
+
+const std::vector<Node*> & Graph::GetNodeData() {
+	return _nodes;
+}
