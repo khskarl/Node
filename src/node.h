@@ -24,21 +24,25 @@ struct NodeType
 };
 
 
-extern struct NodeType gNodeTypes[2];
+extern struct NodeType gNodeTypes[3];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class Node {
 public:
-	Node(ImVec2 pPos);
 	ImVec2 pos;
 
-	int id;
 	const char * name;
 	std::vector<Slot*> inputs;
 	Slot* output;
 
+	Node(ImVec2 pPos, NodeType pType);
+	const unsigned GetID();
+
 private:
+	int _id;
+
+	void SetupSlots(NodeType pType);
 	
 };
 

@@ -19,13 +19,17 @@ struct Link
 
 class Graph {
 public:
-	void AddNode(ImVec2 pPos, NodeType *pType);
+	void AddNode(ImVec2 pPos, NodeType pType);
 	void AddLink();
 
 	const std::vector<Node*> & GetNodeData();
+	const unsigned GetNumNodes();
+
 private:
 	std::vector<Node*> _nodes;
 	std::vector<Link> _links;
+
+
 };
 
 

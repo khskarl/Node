@@ -11,61 +11,22 @@ using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint32_t s_id = 0;
+// static void SetupSlots(std::vector<Link*>& connections, SlotDesc* connectionDescs)
+// {
+// 	// for (int i = 0; i < MAX_CONNECTION_COUNT; ++i)
+// 	// {
+// 	// 	const SlotDesc& desc = connectionDescs[i];
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 	// 	if (!desc.name)
+// 	// 		break;
 
-static void SetupSlots(std::vector<Link*>& connections/*, SlotDesc* connectionDescs*/)
-{
-	// for (int i = 0; i < MAX_CONNECTION_COUNT; ++i)
-	// {
-	// 	const SlotDesc& desc = connectionDescs[i];
+// 	// 	Slot* slot = new Slot;
+// 	// 	slot->desc = desc;
 
-	// 	if (!desc.name)
-	// 		break;
+// 	// 	connections.push_back(con);
+// 	// }
+// }
 
-	// 	Slot* slot = new Slot;
-	// 	slot->desc = desc;
-
-	// 	connections.push_back(con);
-	// }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static Node* CreateNodeFromType(ImVec2 pos, NodeType* nodeType)
-{
-	Node* node = new Node(pos);
-	node->id   = s_id++;
-	node->name = nodeType->name;
-
-	// SetupSlots(node->inputLinks, nodeType->inputLinks);
-	// SetupSlots(node->outputLinks, nodeType->outputLinks);
-
-	// Set slots positions
-	{
-		float slotHeight = 0;
-		float dx = Settings::NodeSize.y / node->inputs.size();
-		for (Slot& slot : node->inputs)
-		{
-			slot.pos = ImVec2(0.0f, slotHeight + dx / 2.f);
-			slotHeight += dx;
-		}
-	}
-
-	node->pos = pos;
-	ImVec2 size;
-	size.x = Settings::NodeSize.x;	
-	size.y = Settings::NodeSize.y / 2.f;
-
-	// set the positions for the output nodes
-	// for (Slot* l : node->outputLinks)
-	// {		
-	// 	l->pos = ImVec2(size.x, size.y);
-	// }
-
-	return node;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -258,13 +219,9 @@ Application::Application() {
 }
 
 void Application::Init() {
-	Node* node = CreateNodeFromType(ImVec2(100, 200), &gNodeTypes[0]);
-	_graph.AddNode(ImVec2(100, 200), &gNodeTypes[0]);
-	// s_nodes.push_back(node);
-
-	node = CreateNodeFromType(ImVec2(600, 200), &gNodeTypes[1]);
-	_graph.AddNode(ImVec2(600, 200), &gNodeTypes[1]);
-	// s_nodes.push_back(node);
+	_graph.AddNode(ImVec2(100, 200), gNodeTypes[0]);
+	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1]);
+	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2]);
 }
 
 
@@ -322,22 +279,21 @@ void Application::ShowGraphEditor()
 	}
 
 	// Draw context menu
-	// ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
-	// if (ImGui::BeginPopup("context_menu"))
-	// {
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
+	if (ImGui::BeginPopup("context_menu"))
+	{
 
-	// 	for (int i = 0; i < (int)sizeofArray(s_nodeTypes); ++i)
-	// 	{
-	// 		if (ImGui::MenuItem(s_nodeTypes[i].name))
-	// 		{
-	// 			Node* node = CreateNodeFromType(ImGui::GetIO().MousePos, &s_nodeTypes[i]);
-	// 			s_nodes.push_back(node);
-	// 		}
-	// 	}
+		for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
+		{
+			if (ImGui::MenuItem(gNodeTypes[i].name))
+			{
+				_graph.AddNode(ImGui::GetIO().MousePos, gNodeTypes[i]);
+			}
+		}
 
-	// 	ImGui::EndPopup();
-	// }
-	// ImGui::PopStyleVar();
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleVar();
 
 	// Scrolling
 	if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(2, 0.0f))
