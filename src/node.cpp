@@ -58,7 +58,7 @@ void Node::SetupSlots(NodeType pType) {
 		inputs.push_back(slot);
 	}
 
-	// Set slots positions
+	// Set input slots positions
 	{
 		float slotHeight = 0;
 		float dx = Settings::NodeSize.y / inputs.size();
@@ -69,6 +69,18 @@ void Node::SetupSlots(NodeType pType) {
 			slotHeight += dx;
 		}
 	}
+
+	// Setup output slot
+	{
+		Slot * slot = new Slot;
+		slot->dataType = pType.outputSlot;
+		slot->pos = ImVec2(Settings::NodeSize.y, 
+						   Settings::NodeSize.y / 2.f);
+
+		output = slot;
+	}
+
+
 }
 
 Node::Node(ImVec2 pPos, NodeType pType) {

@@ -138,23 +138,21 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	offset.y += 40.0f;
 
 	// Output rendering
-	// for (Slot* slot : node->output)
-	// {
-	// 	textSize = ImGui::CalcTextSize(con->desc.name);
+	{
+		Slot * slot = node->output;
 
-	// 	ImGui::SetCursorScreenPos(offset + ImVec2(con->pos.x - (textSize.x + 10.0f), 0));
+		ImColor slotColor = Settings::SlotColor;
+		// if (IsSlotHovered(con, rectMin))
+		// 	slotColor = ImColor(200, 200, 200);
 
-	// 	ImColor slotColor = Settings::SlotColor;
-	// 	float slotRadius = Settings::SlotRadius;
-	// 	// if (IsSlotHovered(con, rectMin))
-	// 	// 	slotColor = ImColor(200, 200, 200);
+		float slotRadius = Settings::SlotRadius;
 
-	// 	drawList->AddCircleFilled(rectMin + con->pos, 
-	// 							  slotRadius, 
-	// 							  slotColor); 
+		drawList->AddCircleFilled(rectMin + slot->pos, 
+								  slotRadius, 
+								  slotColor); 
 
-	// 	offset.y += textSize.y + 2.0f;
-	// }
+		offset.y += textSize.y + 2.0f;
+	}
 
 
 	//for (int i = 0; i < node->outputLinks.size(); ++i)
