@@ -54,20 +54,18 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 {
 	int hoveredNodeID = -1;
 
-	ImGui::PushID(node->GetID());
+ 	ImGui::PushID(node->GetID());
 
 	// Display node contents first
 	bool old_any_active = ImGui::IsAnyItemActive();
-
-	// Compute useful size and positions
-	ImVec2 textSize = ImGui::CalcTextSize(node->name);
-
-	ImVec2 rectMin = offset + node->pos;
-	ImVec2 rectMax = rectMin + Settings::NodeSize;
 		
 	// Save the size of what we have emitted and weither any of the widgets are being used
 	bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
 	
+	// Compute dimensions of the node
+	ImVec2 rectMin = offset + node->pos;
+	ImVec2 rectMax = rectMin + Settings::NodeSize;
+
 	// Display node box
 	ImGui::SetCursorScreenPos(rectMin);
 	ImGui::InvisibleButton("node", Settings::NodeSize);
@@ -85,10 +83,6 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	if (hoveredNodeID == node->GetID()) 
 		backgroundColor = Settings::NodeBgHighlightColor;
 	
-
-	ImVec2 titleArea = rectMax;
-	titleArea.y = rectMin.y + 25.0f;
-
 	// Draw border of the node
 	{	
 		ImVec2 borderRectMin = rectMin - ImVec2(4, 4);
@@ -102,12 +96,15 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 		drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f); 
 	}
 
-
-	// Draw title background
-	drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40), 4.0f); 
-	
 	// Draw title
 	{
+		ImVec2 textSize = ImGui::CalcTextSize(node->name);
+		ImVec2 titleArea = rectMax;
+		titleArea.y = rectMin.y + 25.0f;
+
+		// Draw title background
+		drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40), 4.0f); 
+
 		ImVec2 pos = rectMin + Settings::NodeWindowPadding;
 		pos.x = rectMin.x + (Settings::NodeSize.x / 2) - textSize.x / 2;
 		ImGui::SetCursorScreenPos(pos);
@@ -120,8 +117,6 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	// Draw input slots
 	for (Slot* slot : node->inputs)
 	{
-		ImGui::SetCursorScreenPos(offset + ImVec2(10.0f, 0));
-
 		ImColor slotColor = Settings::NodeColor;
 
 		// if (IsSlotHovered(slot, rectMin))
@@ -131,13 +126,9 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 								  Settings::SlotRadius, 
 								  slotColor); 
 
-		offset.y += textSize.y + 2.0f;
 	}
 
-	offset = rectMin;
-	offset.y += 40.0f;
-
-	// Output rendering
+	// Draw output slot
 	{
 		Slot * slot = node->output;
 
@@ -145,18 +136,10 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 		// if (IsSlotHovered(con, rectMin))
 		// 	slotColor = ImColor(200, 200, 200);
 
-		float slotRadius = Settings::SlotRadius;
-
 		drawList->AddCircleFilled(rectMin + slot->pos, 
-								  slotRadius, 
+								  Settings::SlotRadius, 
 								  slotColor); 
-
-		offset.y += textSize.y + 2.0f;
 	}
-
-
-	//for (int i = 0; i < node->outputLinks.size(); ++i)
-	//	drawList->AddCircleFilled(offset + node->outputSlotPos(i), NODE_SLOT_RADIUS, ImColor(150,150,150,150));
 
 	if (node_widgets_active || node_moving_active)
 		node_selected = node->GetID();
