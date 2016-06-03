@@ -30,11 +30,6 @@ void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 	drawList->PathStroke(Settings::LinkColor, false, 3.0f);
 }
 
-void DrawSlots(ImDrawList* drawList, ImVec2 offset, Node* node)
-{
-
-}
-
 // Shouldn't be here
 bool IsSlotHovered(Slot* slot, ImVec2 offset)
 {
@@ -46,9 +41,38 @@ bool IsSlotHovered(Slot* slot, ImVec2 offset)
 
 	float distance = (xd * xd) + (yd * yd);
 	float radius = Settings::SlotRadius;
+
 	return distance < (radius * radius); 
 }
 
+static void DrawSlots(ImDrawList* drawList, ImVec2 parentPos, Node* node) {
+	// Draw input slots
+	for (Slot* slot : node->inputs)
+	{
+		ImColor slotColor = Settings::NodeColor;
+
+		// if (IsSlotHovered(slot, rectMin))
+		// 	slotColor = ImColor(200, 200, 200);
+
+		drawList->AddCircleFilled(parentPos + slot->pos, 
+								  Settings::SlotRadius, 
+								  slotColor); 
+
+	}
+
+	// Draw output slot
+	{
+		Slot * slot = node->output;
+
+		ImColor slotColor = Settings::SlotColor;
+		// if (IsSlotHovered(con, rectMin))
+		// 	slotColor = ImColor(200, 200, 200);
+
+		drawList->AddCircleFilled(parentPos + slot->pos, 
+								  Settings::SlotRadius, 
+								  slotColor); 
+	}
+}
 
 void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selected)
 {
@@ -111,35 +135,7 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 		ImGui::Text("%s", node->name);
 	}
 
-	offset = rectMin;
-	offset.y += 40.0f;
-
-	// Draw input slots
-	for (Slot* slot : node->inputs)
-	{
-		ImColor slotColor = Settings::NodeColor;
-
-		// if (IsSlotHovered(slot, rectMin))
-		// 	slotColor = ImColor(200, 200, 200);
-
-		drawList->AddCircleFilled(rectMin + slot->pos, 
-								  Settings::SlotRadius, 
-								  slotColor); 
-
-	}
-
-	// Draw output slot
-	{
-		Slot * slot = node->output;
-
-		ImColor slotColor = Settings::SlotColor;
-		// if (IsSlotHovered(con, rectMin))
-		// 	slotColor = ImColor(200, 200, 200);
-
-		drawList->AddCircleFilled(rectMin + slot->pos, 
-								  Settings::SlotRadius, 
-								  slotColor); 
-	}
+	DrawSlots(drawList, rectMin, node);
 
 	if (node_widgets_active || node_moving_active)
 		node_selected = node->GetID();

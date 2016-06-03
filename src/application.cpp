@@ -192,25 +192,24 @@ Node* findNodeByCon(Link* findCon)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void DrawLinks(ImDrawList* drawList, ImVec2 offset)
+static const void DrawLinks(ImDrawList* drawList, Graph& graph, ImVec2 offset)
 {
-	// for (Node* node : s_nodes)
-	// {
-	// 	for (Slot* con : node->input)
-	// 	{
-	// 		if (!con->input)
-	// 			continue;
+	std::vector<Link*> links = graph.GetLinkData();
 
-	// 		Node* targetNode = findNodeByCon(con->input);
+	for (Link* link : links)
+	{
+		Slot* fromSlot = link->from;
+		Slot* toSlot   = link->to;
+		Node* fromNode = fromSlot->parent;
+		Node* toNode   = toSlot->parent;
 
-	// 		if (!targetNode)
-	// 			continue;
+		ImVec2 fromPos = fromSlot->pos + fromNode->pos + offset;
+		ImVec2 toPos = toSlot->pos + toNode->pos + offset;
 
-	// 		DrawHermite(drawList, 
-	// 					offset + targetNode->pos + con->input->pos, 
-	// 					offset + node->pos + con->pos);
-	// 	}
-	// }
+		DrawHermite(drawList, 
+					fromPos, 
+					toPos);
+	}
 }
 ///////////////////
 
@@ -222,6 +221,10 @@ void Application::Init() {
 	_graph.AddNode(ImVec2(100, 200), gNodeTypes[0]);
 	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1]);
 	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2]);
+	Slot* from = _graph.GetNodeData()[0]->output;
+	Slot* to = _graph.GetNodeData()[1]->	inputs[0];
+
+	_graph.AddLink(from, to);
 }
 
 
@@ -261,7 +264,7 @@ void Application::ShowGraphEditor()
 		DrawNode(drawList, scrolling, node, node_selected);
 
 	// updateDraging(scrolling);
-	// DrawLinks(drawList, scrolling);
+	DrawLinks(drawList, _graph, scrolling);
 
 	// Open context menu
 	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))

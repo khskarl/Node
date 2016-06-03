@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include "settings.h"
 
+class Node;
 
 enum DataType 
 {
@@ -12,6 +13,7 @@ enum DataType
 };
 
 struct Slot {
+	Node* parent;
 	ImVec2 pos;
 	DataType dataType;
 };
@@ -40,7 +42,7 @@ public:
 	const unsigned GetID();
 
 private:
-	int _id;
+	unsigned _id;
 
 	void SetupSlots(NodeType pType);
 	

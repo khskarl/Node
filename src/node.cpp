@@ -52,9 +52,7 @@ void Node::SetupSlots(NodeType pType) {
 		// if (!slotDataType)
 			// continue;
 		Slot * slot = new Slot;
-		slot->pos = ImVec2(0, 0);
 		slot->dataType = slotDataType;
-		
 		inputs.push_back(slot);
 	}
 
@@ -65,6 +63,7 @@ void Node::SetupSlots(NodeType pType) {
 
 		for (Slot * slot : inputs)
 		{
+			slot->parent = this;
 			slot->pos = ImVec2(0.0f, slotHeight + dx / 2.f);
 			slotHeight += dx;
 		}
@@ -73,6 +72,7 @@ void Node::SetupSlots(NodeType pType) {
 	// Setup output slot
 	{
 		Slot * slot = new Slot;
+		slot->parent = this;
 		slot->dataType = pType.outputSlot;
 		slot->pos = ImVec2(Settings::NodeSize.y, 
 						   Settings::NodeSize.y / 2.f);
@@ -84,8 +84,8 @@ void Node::SetupSlots(NodeType pType) {
 }
 
 Node::Node(ImVec2 pPos, NodeType pType) {
-	pos = pPos;
 	_id = GetUniqueNodeID();
+	pos = pPos;
 	name = pType.name;
 	
 	this->SetupSlots(pType);
