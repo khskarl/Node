@@ -30,6 +30,27 @@ void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 	drawList->PathStroke(Settings::LinkColor, false, 3.0f);
 }
 
+void DrawLinks(ImDrawList* drawList, Graph& graph, ImVec2 offset)
+{
+	std::vector<Link*> links = graph.GetLinkData();
+
+	for (Link* link : links)
+	{
+		Slot* fromSlot = link->from;
+		Slot* toSlot   = link->to;
+		Node* fromNode = fromSlot->parent;
+		Node* toNode   = toSlot->parent;
+
+		ImVec2 fromPos = fromSlot->pos + fromNode->pos + offset;
+		ImVec2 toPos = toSlot->pos + toNode->pos + offset;
+
+		DrawHermite(drawList, 
+					fromPos, 
+					toPos);
+	}
+}
+
+
 // Shouldn't be here
 bool IsSlotHovered(Slot* slot, ImVec2 parentPos)
 {
@@ -45,32 +66,27 @@ bool IsSlotHovered(Slot* slot, ImVec2 parentPos)
 	return distance < (radius * radius); 
 }
 
+static void DrawSlot(ImDrawList* drawList, ImVec2 parentPos, Slot* slot) {
+	ImColor slotColor = Settings::NodeColor;
+
+	if (IsSlotHovered(slot, parentPos))
+		slotColor = ImColor(200, 200, 200);
+
+	drawList->AddCircleFilled(parentPos + slot->pos, 
+							  Settings::SlotRadius, 
+							  slotColor); 
+}
+
 static void DrawSlots(ImDrawList* drawList, ImVec2 parentPos, Node* node) {
 	// Draw input slots
 	for (Slot* slot : node->inputs)
 	{
-		ImColor slotColor = Settings::NodeColor;
-
-		if (IsSlotHovered(slot, parentPos))
-			slotColor = ImColor(200, 200, 200);
-
-		drawList->AddCircleFilled(parentPos + slot->pos, 
-								  Settings::SlotRadius, 
-								  slotColor); 
-
+		DrawSlot(drawList, parentPos, slot);
 	}
 
 	// Draw output slot
 	{
-		Slot * slot = node->output;
-
-		ImColor slotColor = Settings::SlotColor;
-		if (IsSlotHovered(slot, parentPos))
-			slotColor = ImColor(200, 200, 200);
-
-		drawList->AddCircleFilled(parentPos + slot->pos, 
-								  Settings::SlotRadius, 
-								  slotColor); 
+		DrawSlot(drawList, parentPos, node->output);; 
 	}
 }
 
@@ -94,27 +110,34 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 	ImGui::SetCursorScreenPos(rectMin);
 	ImGui::InvisibleButton("node", Settings::NodeSize);
 
+	bool isNodeHovered = false;
+
 	if (ImGui::IsItemHovered())
 		hoveredNodeID = node->GetID();
+		// isNodeHovered = true;
+
+	if (hoveredNodeID == node->GetID()) 
+		isNodeHovered = true;
 	
 	bool node_moving_active = false;
 	
 	if (ImGui::IsItemActive() /*&& !s_dragNode.con*/)
 		node_moving_active = true;
 
-	ImU32 backgroundColor = Settings::NodeBgColor;
-
-	if (hoveredNodeID == node->GetID()) 
-		backgroundColor = Settings::NodeBgHighlightColor;
+	ImU32 backgroundColor = Settings::NodeBgColor; 
 	
 	// Draw border of the node
 	{	
 		ImVec2 borderRectMin = rectMin - ImVec2(4, 4);
 		ImVec2 borderRectMax = rectMax + ImVec2(4, 4);
 		
+		ImU32 borderColor = Settings::NodeBorderColor;
+		if (isNodeHovered == true)
+			borderColor = Settings::NodeBorderHighlightColor;
+
 		drawList->AddRectFilled(borderRectMin, 
 						  		borderRectMax, 
-						  		Settings::NodeBorderColor, 
+						  		borderColor, 
 						  		4.0f); 
 		// Draw NodeBackground
 		drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f); 
@@ -131,7 +154,7 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 
 		ImVec2 pos = rectMin + Settings::NodeWindowPadding;
 		pos.x = rectMin.x + (Settings::NodeSize.x / 2) - textSize.x / 2;
-		
+
 		ImGui::SetCursorScreenPos(pos);
 		ImGui::Text("%s", node->name);
 	}

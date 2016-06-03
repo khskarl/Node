@@ -11,25 +11,6 @@ using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// static void SetupSlots(std::vector<Link*>& connections, SlotDesc* connectionDescs)
-// {
-// 	// for (int i = 0; i < MAX_CONNECTION_COUNT; ++i)
-// 	// {
-// 	// 	const SlotDesc& desc = connectionDescs[i];
-
-// 	// 	if (!desc.name)
-// 	// 		break;
-
-// 	// 	Slot* slot = new Slot;
-// 	// 	slot->desc = desc;
-
-// 	// 	connections.push_back(con);
-// 	// }
-// }
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 enum DragState 
 {
 	Default,
@@ -191,26 +172,6 @@ Node* findNodeByCon(Link* findCon)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-static const void DrawLinks(ImDrawList* drawList, Graph& graph, ImVec2 offset)
-{
-	std::vector<Link*> links = graph.GetLinkData();
-
-	for (Link* link : links)
-	{
-		Slot* fromSlot = link->from;
-		Slot* toSlot   = link->to;
-		Node* fromNode = fromSlot->parent;
-		Node* toNode   = toSlot->parent;
-
-		ImVec2 fromPos = fromSlot->pos + fromNode->pos + offset;
-		ImVec2 toPos = toSlot->pos + toNode->pos + offset;
-
-		DrawHermite(drawList, 
-					fromPos, 
-					toPos);
-	}
-}
 ///////////////////
 
 Application::Application() {
@@ -235,18 +196,19 @@ void Application::ShowGraphEditor()
 	ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Graph Editor", &_isGraphEditorOpen);
 
-	bool open_context_menu = false;
+	// TODO: Remove/refactor those
 	int node_hovered_in_list = -1;
 	int node_hovered_in_scene = -1;
 
 	static int node_selected = -1;
-	static ImVec2 scrolling = ImVec2(0.0f, 0.0f);
+	static ImVec2 scrollOffset = ImVec2(0.0f, 0.0f);
+	// End TODO
 
 	ImGui::SameLine();
 	ImGui::BeginGroup();
 
 	// Create our child canvas
-	//ImGui::Text("Hold middle mouse button to scroll (%.2f,%.2f)", scrolling.x, scrolling.y);
+	// ImGui::Text("Hold middle mouse button to scroll (%.2f,%.2f)", scrollOffset.x, scrollOffset.y);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, Settings::BackgroundColor);
@@ -261,12 +223,13 @@ void Application::ShowGraphEditor()
 
 	std::vector<Node*> nodes = _graph.GetNodeData();
 	for (Node * node : nodes)
-		DrawNode(drawList, scrolling, node, node_selected);
+		DrawNode(drawList, scrollOffset, node, node_selected);
 
-	// updateDraging(scrolling);
-	DrawLinks(drawList, _graph, scrolling);
+	// updateDraging(scrollOffset);
+	DrawLinks(drawList, _graph, scrollOffset);
 
 	// Open context menu
+	bool open_context_menu = false;
 	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))
 	{
 		node_selected = node_hovered_in_list = node_hovered_in_scene = -1;
@@ -282,25 +245,26 @@ void Application::ShowGraphEditor()
 	}
 
 	// Draw context menu
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
-	if (ImGui::BeginPopup("context_menu"))
 	{
-
-		for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
-		{
-			if (ImGui::MenuItem(gNodeTypes[i].name))
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
+		if (ImGui::BeginPopup("context_menu"))
+		{	
+			for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
 			{
-				_graph.AddNode(ImGui::GetIO().MousePos, gNodeTypes[i]);
+				if (ImGui::MenuItem(gNodeTypes[i].name))
+				{
+					_graph.AddNode(ImGui::GetIO().MousePos, gNodeTypes[i]);
+				}
 			}
+	
+			ImGui::EndPopup();
 		}
-
-		ImGui::EndPopup();
+		ImGui::PopStyleVar();
 	}
-	ImGui::PopStyleVar();
 
 	// Scrolling
 	if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(2, 0.0f))
-		scrolling = scrolling + ImGui::GetIO().MouseDelta;
+		scrollOffset = scrollOffset + ImGui::GetIO().MouseDelta;
 
 	ImGui::PopItemWidth();
 	ImGui::EndChild();

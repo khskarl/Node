@@ -23,6 +23,7 @@ struct NodeType
 	const char* name;
 	DataType inputSlots[MAX_INPUT_COUNT];
 	DataType outputSlot;
+	unsigned numInputs;
 };
 
 

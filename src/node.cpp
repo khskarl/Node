@@ -11,6 +11,7 @@ struct NodeType gNodeTypes[] =
 		},
 		// Output
 		DataType::Color,
+		2,
 	},
 
 	{
@@ -21,7 +22,7 @@ struct NodeType gNodeTypes[] =
 		},
 		// Output
 		DataType::Color,
-		
+		1,
 	},
 
 	{
@@ -32,7 +33,7 @@ struct NodeType gNodeTypes[] =
 		},
 		// Output
 		DataType::Color,
-		
+		1,
 	},
 };
 
@@ -47,12 +48,15 @@ void Node::SetupSlots(NodeType pType) {
 	// {
 	// }
 	// Create slots
-	for (DataType slotDataType : pType.inputSlots)
-	{		
-		// if (!slotDataType)
-			// continue;
+	// for (DataType slotDataType : pType.inputSlots)
+	// {		
+	// 	if (!slotDataType)
+	// 		continue;
+	// }
+	for (unsigned i = 0; i < pType.numInputs; ++i)
+	{
 		Slot * slot = new Slot;
-		slot->dataType = slotDataType;
+		slot->dataType = pType.inputSlots[i];
 		inputs.push_back(slot);
 	}
 

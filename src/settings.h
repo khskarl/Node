@@ -5,6 +5,9 @@
 
 #define MAX_INPUT_COUNT 4
 
+#define sizeofArray(t) (sizeof(t) / sizeof(t[0]))
+
+
 namespace Settings {
 
 const float SlotRadius = 6.0f;
@@ -18,9 +21,9 @@ const ImVec2 NodeSize(120, 120);
 
 const ImColor NodeColor(150, 150, 150);
 const ImColor NodeBgColor(60, 60, 60);
-const ImColor NodeBgHighlightColor(60, 60, 60);
+const ImColor NodeBgHighlightColor(70, 70, 70);
 const ImColor NodeBorderColor(100,100,100);
-const ImColor NodeBorderHighlightColor(125,125,125);
+const ImColor NodeBorderHighlightColor(125,130,125);
 
 const ImColor SlotColor(150, 150, 150);
 
