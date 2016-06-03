@@ -10,5 +10,5 @@ static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs) { return Im
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2);
 void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selected);
-bool IsSlotHovered(Link* c, ImVec2 offset);
+bool IsSlotHovered(Link* c, ImVec2 parentPos);
 #endif

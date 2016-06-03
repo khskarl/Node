@@ -31,10 +31,10 @@ void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 }
 
 // Shouldn't be here
-bool IsSlotHovered(Slot* slot, ImVec2 offset)
+bool IsSlotHovered(Slot* slot, ImVec2 parentPos)
 {
 	ImVec2 mousePos = ImGui::GetIO().MousePos;
-	ImVec2 slotPos = offset + slot->pos;
+	ImVec2 slotPos = parentPos + slot->pos;
 
 	float xd = mousePos.x - slotPos.x;
 	float yd = mousePos.y - slotPos.y;
@@ -51,8 +51,8 @@ static void DrawSlots(ImDrawList* drawList, ImVec2 parentPos, Node* node) {
 	{
 		ImColor slotColor = Settings::NodeColor;
 
-		// if (IsSlotHovered(slot, rectMin))
-		// 	slotColor = ImColor(200, 200, 200);
+		if (IsSlotHovered(slot, parentPos))
+			slotColor = ImColor(200, 200, 200);
 
 		drawList->AddCircleFilled(parentPos + slot->pos, 
 								  Settings::SlotRadius, 
@@ -65,8 +65,8 @@ static void DrawSlots(ImDrawList* drawList, ImVec2 parentPos, Node* node) {
 		Slot * slot = node->output;
 
 		ImColor slotColor = Settings::SlotColor;
-		// if (IsSlotHovered(con, rectMin))
-		// 	slotColor = ImColor(200, 200, 200);
+		if (IsSlotHovered(slot, parentPos))
+			slotColor = ImColor(200, 200, 200);
 
 		drawList->AddCircleFilled(parentPos + slot->pos, 
 								  Settings::SlotRadius, 
@@ -131,6 +131,7 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 
 		ImVec2 pos = rectMin + Settings::NodeWindowPadding;
 		pos.x = rectMin.x + (Settings::NodeSize.x / 2) - textSize.x / 2;
+		
 		ImGui::SetCursorScreenPos(pos);
 		ImGui::Text("%s", node->name);
 	}
