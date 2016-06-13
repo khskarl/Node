@@ -6,13 +6,19 @@
 #include "settings.h"
 
 class Node;
+class Graph;
 
 enum DataType 
 {
 	Color,
 };
 
-struct Slot {
+class Slot {
+public:
+	ImVec2 GetPos();
+	ImVec2 GetWorldPos();
+	void SetPos(ImVec2 pPos);
+public:
 	Node* parent;
 	ImVec2 pos;
 	DataType dataType;
@@ -33,6 +39,7 @@ extern struct NodeType gNodeTypes[3];
 
 class Node {
 public:
+	Graph* parent;
 	ImVec2 pos;
 
 	const char * name;
@@ -41,6 +48,8 @@ public:
 
 	Node(ImVec2 pPos, NodeType pType);
 	const unsigned GetID();
+	ImVec2 GetPos();
+	ImVec2 GetWorldPos();
 
 private:
 	unsigned _id;

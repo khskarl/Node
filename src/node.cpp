@@ -1,5 +1,5 @@
 #include "node.h"
-
+#include "settings.h"
 struct NodeType gNodeTypes[] =
 {
 	{
@@ -37,7 +37,20 @@ struct NodeType gNodeTypes[] =
 	},
 };
 
+// SLOT
+ImVec2 Slot::GetPos(){
+	return pos;
+}
 
+ImVec2 Slot::GetWorldPos(){
+	return pos + parent->GetWorldPos();
+}
+
+void Slot::SetPos(ImVec2 pPos){
+	pos = pPos;
+}
+
+// NODE
 static const unsigned GetUniqueNodeID() {
 	static unsigned uid = 0;
 	return uid++;
@@ -93,21 +106,16 @@ Node::Node(ImVec2 pPos, NodeType pType) {
 	name = pType.name;
 	
 	this->SetupSlots(pType);
-
-	
-
-	// ImVec2 size;
-	// size.x = Settings::NodeSize.x;	
-	// size.y = Settings::NodeSize.y / 2.f;
-
-	// set the positions for the output nodes
-	// for (Slot* l : node->outputLinks)
-	// {		
-	// 	l->pos = ImVec2(size.x, size.y);
-	// }
-
 }
 
 const unsigned Node::GetID() {
 	return _id;
+}
+
+ImVec2 Node::GetPos(){
+	return pos;
+}
+
+ImVec2 Node::GetWorldPos(){
+	return pos;
 }

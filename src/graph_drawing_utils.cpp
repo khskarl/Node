@@ -5,6 +5,11 @@
 #include "graph.h"
 #include "settings.h"
 
+static ImVec2 _graphOffset = ImVec2(0, 0);
+
+void SetDrawingOffset(ImVec2 offset) {
+	_graphOffset = offset;
+}
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 {
@@ -30,7 +35,7 @@ void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 	drawList->PathStroke(Settings::LinkColor, false, 3.0f);
 }
 
-void DrawLinks(ImDrawList* drawList, Graph& graph, ImVec2 offset)
+void DrawLinks(ImDrawList* drawList, Graph& graph)
 {
 	std::vector<Link*> links = graph.GetLinkData();
 
@@ -38,11 +43,9 @@ void DrawLinks(ImDrawList* drawList, Graph& graph, ImVec2 offset)
 	{
 		Slot* fromSlot = link->from;
 		Slot* toSlot   = link->to;
-		Node* fromNode = fromSlot->parent;
-		Node* toNode   = toSlot->parent;
 
-		ImVec2 fromPos = fromSlot->pos + fromNode->pos + offset;
-		ImVec2 toPos = toSlot->pos + toNode->pos + offset;
+		ImVec2 fromPos = fromSlot->GetWorldPos() + _graphOffset;
+		ImVec2 toPos = toSlot->GetWorldPos() + _graphOffset;
 
 		DrawHermite(drawList, 
 					fromPos, 
@@ -52,10 +55,10 @@ void DrawLinks(ImDrawList* drawList, Graph& graph, ImVec2 offset)
 
 
 // Shouldn't be here
-bool IsSlotHovered(Slot* slot, ImVec2 parentPos)
+bool IsSlotHovered(Slot* slot)
 {
 	ImVec2 mousePos = ImGui::GetIO().MousePos;
-	ImVec2 slotPos = parentPos + slot->pos;
+	ImVec2 slotPos = slot->GetWorldPos() + _graphOffset;
 
 	float xd = mousePos.x - slotPos.x;
 	float yd = mousePos.y - slotPos.y;
@@ -69,7 +72,7 @@ bool IsSlotHovered(Slot* slot, ImVec2 parentPos)
 static void DrawSlot(ImDrawList* drawList, ImVec2 parentPos, Slot* slot) {
 	ImColor slotColor = Settings::NodeColor;
 
-	if (IsSlotHovered(slot, parentPos))
+	if (IsSlotHovered(slot))
 		slotColor = ImColor(200, 200, 200);
 
 	drawList->AddCircleFilled(parentPos + slot->pos, 
@@ -90,7 +93,15 @@ static void DrawSlots(ImDrawList* drawList, ImVec2 parentPos, Node* node) {
 	}
 }
 
-void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selected)
+Node* GetHoveredNode(const Graph & graph) {
+
+}
+
+Slot* GetHoveredSlot(const Graph & graph) {
+
+}
+
+void DrawNode(ImDrawList* drawList, Node* node, int& node_selected)
 {
 	int hoveredNodeID = -1;
 
@@ -98,12 +109,12 @@ void DrawNode(ImDrawList* drawList, ImVec2 offset, Node* node, int& node_selecte
 
 	// Display node contents first
 	bool old_any_active = ImGui::IsAnyItemActive();
-		
+
 	// Save the size of what we have emitted and weither any of the widgets are being used
 	bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
 	
 	// Compute dimensions of the node
-	ImVec2 rectMin = offset + node->pos;
+	ImVec2 rectMin = _graphOffset + node->pos;
 	ImVec2 rectMax = rectMin + Settings::NodeSize;
 
 	// Display node box

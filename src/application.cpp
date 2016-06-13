@@ -221,12 +221,13 @@ void Application::ShowGraphEditor()
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 
+	// updateDraging(scrollOffset);
+	SetDrawingOffset(scrollOffset);
+	DrawLinks(drawList, _graph);
+	
 	std::vector<Node*> nodes = _graph.GetNodeData();
 	for (Node * node : nodes)
-		DrawNode(drawList, scrollOffset, node, node_selected);
-
-	// updateDraging(scrollOffset);
-	DrawLinks(drawList, _graph, scrollOffset);
+		DrawNode(drawList, node, node_selected);
 
 	// Open context menu
 	bool open_context_menu = false;
@@ -253,7 +254,7 @@ void Application::ShowGraphEditor()
 			{
 				if (ImGui::MenuItem(gNodeTypes[i].name))
 				{
-					_graph.AddNode(ImGui::GetIO().MousePos, gNodeTypes[i]);
+					_graph.AddNode(ImGui::GetIO().MousePos - scrollOffset, gNodeTypes[i]);
 				}
 			}
 	

@@ -12,7 +12,7 @@ class Application {
 private:
 	bool _isGraphEditorOpen;
 	void ShowGraphEditor();
-
+	ImVec2 graphOffset;
 	Graph _graph;
 public:
 	Application();
