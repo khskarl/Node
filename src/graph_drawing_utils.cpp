@@ -6,9 +6,14 @@
 #include "settings.h"
 
 static ImVec2 _graphOffset = ImVec2(0, 0);
+static Node* _selectedNode = nullptr;
 
 void SetDrawingOffset(ImVec2 offset) {
 	_graphOffset = offset;
+}
+
+void SetSelectedNode(Node* pSelectedNode) {
+	_selectedNode = pSelectedNode;
 }
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
@@ -93,15 +98,34 @@ static void DrawSlots(ImDrawList* drawList, ImVec2 parentPos, Node* node) {
 	}
 }
 
-Node* GetHoveredNode(const Graph & graph) {
+Node* GetHoveredNode(Graph & graph) {
+	Node* hoveredNode = nullptr;
+	for (Node* node : graph.GetNodeData())
+	{
+
+	}
+	return hoveredNode;
+}
+
+Slot* GetHoveredSlot(Graph & graph) {
+	Slot* hoveredSlot = nullptr;
+	auto nodes = graph.GetNodeData();
+	for (Node* node : nodes)
+	{
+		for (Slot* slot : node->inputs)
+		{
+			// DrawSlot(drawList, parentPos, slot);
+		}
+	}
+	return hoveredSlot;
+}
+
+void DrawNodes(Graph & graph) 
+{
 
 }
 
-Slot* GetHoveredSlot(const Graph & graph) {
-
-}
-
-void DrawNode(ImDrawList* drawList, Node* node, int& node_selected)
+void DrawNode(ImDrawList* drawList, Node* node)
 {
 	int hoveredNodeID = -1;
 
@@ -121,13 +145,12 @@ void DrawNode(ImDrawList* drawList, Node* node, int& node_selected)
 	ImGui::SetCursorScreenPos(rectMin);
 	ImGui::InvisibleButton("node", Settings::NodeSize);
 
-	bool isNodeHovered = false;
-
 	if (ImGui::IsItemHovered())
 		hoveredNodeID = node->GetID();
-		// isNodeHovered = true;
 
-	if (hoveredNodeID == node->GetID()) 
+	bool isNodeHovered = false;
+
+	if (_selectedNode == node) 
 		isNodeHovered = true;
 	
 	bool node_moving_active = false;
@@ -173,7 +196,7 @@ void DrawNode(ImDrawList* drawList, Node* node, int& node_selected)
 	DrawSlots(drawList, rectMin, node);
 
 	if (node_widgets_active || node_moving_active)
-		node_selected = node->GetID();
+		_selectedNode = node;
 
 	// Drag node 
 	if (node_moving_active && ImGui::IsMouseDragging(0))

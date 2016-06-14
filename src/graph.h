@@ -24,8 +24,8 @@ public:
 	void AddNode(ImVec2 pPos, NodeType pType);
 	void AddLink(Slot* fromSlot, Slot* toSlot);
 
-	const std::vector<Node*>& GetNodeData();
-	const std::vector<Link*>& GetLinkData();
+	std::vector<Node*>& GetNodeData();
+	std::vector<Link*>& GetLinkData();
 	const unsigned GetNumNodes();
 	const unsigned GetNumLinks();
 

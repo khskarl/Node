@@ -6,8 +6,9 @@
 
 
 void SetDrawingOffset(ImVec2 offset);
+void SetSelectedNode(Node* pSelectedNode);
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2);
 void DrawLinks(ImDrawList* drawList, Graph& graph);
-void DrawNode(ImDrawList* drawList, Node* node, int& node_selected);
+void DrawNode(ImDrawList* drawList, Node* node);
 bool IsSlotHovered(Slot* slot);
 #endif

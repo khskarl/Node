@@ -16,10 +16,10 @@ const unsigned Graph::GetNumNodes() {
 	return _nodes.size();
 }
 
-const std::vector<Node*>& Graph::GetNodeData() {
+std::vector<Node*>& Graph::GetNodeData() {
 	return _nodes;
 }
 
-const std::vector<Link*>& Graph::GetLinkData() {
+std::vector<Link*>& Graph::GetLinkData() {
 	return _links;
 }

@@ -40,13 +40,13 @@ endif
 
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -g -c -o $@ $<
 
 all: $(EXE)
 	@echo Build complete for $(ECHO_MESSAGE)
 
 $(EXE): $(OBJS)
-	$(CXX) -o $(EXE) $(OBJS) $(CXXFLAGS) $(LIBS)
+	$(CXX) -g -o $(EXE) $(OBJS) $(CXXFLAGS) $(LIBS)
 
 clean:
 	rm $(EXE) $(OBJS)
