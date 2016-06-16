@@ -6,14 +6,14 @@
 #include "settings.h"
 
 static ImVec2 _graphOffset = ImVec2(0, 0);
-static Node* _selectedNode = nullptr;
+static Node* _hoveredNode = nullptr;
 
 void SetDrawingOffset(ImVec2 offset) {
 	_graphOffset = offset;
 }
 
-void SetSelectedNode(Node* pSelectedNode) {
-	_selectedNode = pSelectedNode;
+void SetHoveredNode(Node* pHoveredNode) {
+	_hoveredNode = pHoveredNode;
 }
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
@@ -103,12 +103,6 @@ Node* GetHoveredNode(Graph & graph) {
 	for (Node* node : graph.GetNodeData())
 	{
 	 	ImGui::PushID(node->GetID());
-
-		// Display node contents first
-		// bool old_any_active = ImGui::IsAnyItemActive();
-
-		// Save the size of what we have emitted and weither any of the widgets are being used
-		// bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
 		
 		// Compute dimensions of the node
 		ImVec2 rectMin = _graphOffset + node->pos;
@@ -121,25 +115,13 @@ Node* GetHoveredNode(Graph & graph) {
 		if (ImGui::IsItemHovered())
 			hoveredNode = node;
 
-
-		// if (_selectedNode == node) 
-		// 	isNodeHovered = true;
-		
-		// bool node_moving_active = false;
-		
-		// if (ImGui::IsItemActive() /*&& !s_dragNode.con*/)
-		// 	node_moving_active = true;
-
-		// 	if (node_widgets_active || node_moving_active)
-		// 	_selectedNode = node;
-
-		// // Drag node 
-		// if (node_moving_active && ImGui::IsMouseDragging(0))
-		// 	node->pos = node->pos + ImGui::GetIO().MouseDelta;
-
 		ImGui::PopID();
 	}
 	return hoveredNode;
+}
+
+void DragNode(Node* node) {
+	node->pos = node->pos + ImGui::GetIO().MouseDelta;
 }
 
 Slot* GetHoveredSlot(Graph & graph) {
@@ -149,7 +131,14 @@ Slot* GetHoveredSlot(Graph & graph) {
 	{
 		for (Slot* slot : node->inputs)
 		{
-			// DrawSlot(drawList, parentPos, slot);
+			if(IsSlotHovered(slot))
+				hoveredSlot = slot;
+		}
+
+		Slot* slot = node->output;
+		{
+			if(IsSlotHovered(slot))
+				hoveredSlot = slot;
 		}
 	}
 	
@@ -176,7 +165,7 @@ void DrawNode(ImDrawList* drawList, Node* node)
 
 	bool isNodeHovered = false;
 
-	if (_selectedNode == node) 
+	if (_hoveredNode == node) 
 		isNodeHovered = true;
 
 	ImU32 backgroundColor = Settings::NodeBgColor; 

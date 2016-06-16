@@ -22,13 +22,13 @@ enum DragState
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-struct DragNode
+struct StructDragNode
 {
 	ImVec2 pos;
 	Link* con;
 };
 
-static DragNode s_dragNode;
+static StructDragNode s_dragNode;
 static DragState s_dragState = DragState::Default;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,15 +200,13 @@ void Application::ShowGraphEditor()
 	int node_hovered_in_list = -1;
 	int node_hovered_in_scene = -1;
 
-	static int node_selected = -1;
-	static ImVec2 scrollOffset = ImVec2(0.0f, 0.0f);
 	// End TODO
 
 	ImGui::SameLine();
 	ImGui::BeginGroup();
 
 	// Create our child canvas
-	// ImGui::Text("Hold middle mouse button to scroll (%.2f,%.2f)", scrollOffset.x, scrollOffset.y);
+	// ImGui::Text("Hold middle mouse button to scroll (%.2f,%.2f)", graphOffset.x, graphOffset.y);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, Settings::BackgroundColor);
@@ -218,34 +216,40 @@ void Application::ShowGraphEditor()
 					  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
 	ImGui::PushItemWidth(120.0f);
 
+	////////////////////
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	
-	//
-
-	// updateDraging(scrollOffset);
-	SetDrawingOffset(scrollOffset);
-	Node* selectedNode = GetHoveredNode(_graph); 
-	SetSelectedNode(selectedNode);
-
+	// updateDraging(graphOffset);
+	SetDrawingOffset(graphOffset);
+	Slot* hoveredSlot = GetHoveredSlot(_graph);
+	//SetHoveredSlot(hoveredSlot);
+	Node* hoveredNode = GetHoveredNode(_graph); 
+	SetHoveredNode(hoveredNode);
+	if (ImGui::IsMouseDown(0) && hoveredNode != nullptr) {
+		DragNode(hoveredNode);
+	}
 
 	DrawLinks(drawList, _graph);
 	DrawNodes(drawList, _graph);
+
+	////////////////////
 
 	// Open context menu
 	bool open_context_menu = false;
 	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))
 	{
-		node_selected = node_hovered_in_list = node_hovered_in_scene = -1;
+		node_hovered_in_list = node_hovered_in_scene = -1;
 		open_context_menu = true;
 	}
+
 	if (open_context_menu)
 	{
 		ImGui::OpenPopup("context_menu");
-		if (node_hovered_in_list != -1)
-			node_selected = node_hovered_in_list;
-		if (node_hovered_in_scene != -1)
-			node_selected = node_hovered_in_scene;
+		// if (node_hovered_in_list != -1)
+		// 	node_selected = node_hovered_in_list;
+		// if (node_hovered_in_scene != -1)
+		// 	node_selected = node_hovered_in_scene;
 	}
 
 	// Draw context menu
@@ -257,7 +261,7 @@ void Application::ShowGraphEditor()
 			{
 				if (ImGui::MenuItem(gNodeTypes[i].name))
 				{
-					_graph.AddNode(ImGui::GetIO().MousePos - scrollOffset, gNodeTypes[i]);
+					_graph.AddNode(ImGui::GetIO().MousePos - graphOffset, gNodeTypes[i]);
 				}
 			}
 	
@@ -268,7 +272,7 @@ void Application::ShowGraphEditor()
 
 	// Scrolling
 	if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(2, 0.0f))
-		scrollOffset = scrollOffset + ImGui::GetIO().MouseDelta;
+		graphOffset = graphOffset + ImGui::GetIO().MouseDelta;
 
 	ImGui::PopItemWidth();
 	ImGui::EndChild();
