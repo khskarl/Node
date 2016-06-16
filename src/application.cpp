@@ -173,7 +173,7 @@ void Application::Init() {
 	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1]);
 	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2]);
 	Slot* from = _graph.GetNodeData()[0]->output;
-	Slot* to = _graph.GetNodeData()[1]->	inputs[0];
+	Slot* to   = _graph.GetNodeData()[1]->inputs[0];
 
 	_graph.AddLink(from, to);
 }
@@ -195,22 +195,34 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 
 		ImGui::Text("A");
 		break;
+
 	case LinkDragState::HoveringSlot:
-		if (ImGui::IsMouseClicked(0) == true && hoveredSlot) {
+		if (hoveredSlot == nullptr) {
+			_linkDragState = LinkDragState::Idle;
+			break;
+		}
+
+		if (ImGui::IsMouseClicked(0) == true) 
+		{
 			otherSlot = hoveredSlot;
 			if (otherSlot->IsOutput())
 				_linkDragState = LinkDragState::DragingInputLink;
 			else					
 				_linkDragState = LinkDragState::DragingOutputLink;
 		}
-		else if (hoveredSlot == nullptr)
-			_linkDragState = LinkDragState::Idle;
 	
 		ImGui::Text("B");
 		break;
+
 	case LinkDragState::DragingInputLink:
-		if (ImGui::IsMouseReleased(0))
+		if (ImGui::IsMouseReleased(0)) {
+			if (hoveredSlot != nullptr) {
+				_graph.AddLink(otherSlot, hoveredSlot);
+			}
+
 			_linkDragState = LinkDragState::Idle;
+			break;
+		}
 
 		DrawHermite(drawList, 
 					otherSlot->GetWorldPos(), 
@@ -218,9 +230,16 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 		
 		ImGui::Text("C");
 		break;
+
 	case LinkDragState::DragingOutputLink:
-		if (ImGui::IsMouseReleased(0))			
+		if (ImGui::IsMouseReleased(0)) { 
+			if (hoveredSlot != nullptr) {
+				_graph.AddLink(hoveredSlot, otherSlot);
+			}
+
 			_linkDragState = LinkDragState::Idle;
+			break;
+		}
 		
 		DrawHermite(drawList,  
 					ImGui::GetIO().MousePos,
