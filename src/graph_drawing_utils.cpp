@@ -102,40 +102,70 @@ Node* GetHoveredNode(Graph & graph) {
 	Node* hoveredNode = nullptr;
 	for (Node* node : graph.GetNodeData())
 	{
+	 	ImGui::PushID(node->GetID());
 
+		// Display node contents first
+		// bool old_any_active = ImGui::IsAnyItemActive();
+
+		// Save the size of what we have emitted and weither any of the widgets are being used
+		// bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
+		
+		// Compute dimensions of the node
+		ImVec2 rectMin = _graphOffset + node->pos;
+		ImVec2 rectMax = rectMin + Settings::NodeSize;
+
+		// Display node box
+		ImGui::SetCursorScreenPos(rectMin);
+		ImGui::InvisibleButton("node", Settings::NodeSize);
+
+		if (ImGui::IsItemHovered())
+			hoveredNode = node;
+
+
+		// if (_selectedNode == node) 
+		// 	isNodeHovered = true;
+		
+		// bool node_moving_active = false;
+		
+		// if (ImGui::IsItemActive() /*&& !s_dragNode.con*/)
+		// 	node_moving_active = true;
+
+		// 	if (node_widgets_active || node_moving_active)
+		// 	_selectedNode = node;
+
+		// // Drag node 
+		// if (node_moving_active && ImGui::IsMouseDragging(0))
+		// 	node->pos = node->pos + ImGui::GetIO().MouseDelta;
+
+		ImGui::PopID();
 	}
 	return hoveredNode;
 }
 
 Slot* GetHoveredSlot(Graph & graph) {
 	Slot* hoveredSlot = nullptr;
-	auto nodes = graph.GetNodeData();
-	for (Node* node : nodes)
+
+	for (Node* node : graph.GetNodeData())
 	{
 		for (Slot* slot : node->inputs)
 		{
 			// DrawSlot(drawList, parentPos, slot);
 		}
 	}
+	
 	return hoveredSlot;
 }
 
-void DrawNodes(Graph & graph) 
-{
 
+void DrawNodes(ImDrawList* drawList, Graph & graph) 
+{
+	for (Node * node : graph.GetNodeData())
+		DrawNode(drawList, node);
 }
 
 void DrawNode(ImDrawList* drawList, Node* node)
 {
-	int hoveredNodeID = -1;
-
  	ImGui::PushID(node->GetID());
-
-	// Display node contents first
-	bool old_any_active = ImGui::IsAnyItemActive();
-
-	// Save the size of what we have emitted and weither any of the widgets are being used
-	bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
 	
 	// Compute dimensions of the node
 	ImVec2 rectMin = _graphOffset + node->pos;
@@ -143,20 +173,11 @@ void DrawNode(ImDrawList* drawList, Node* node)
 
 	// Display node box
 	ImGui::SetCursorScreenPos(rectMin);
-	ImGui::InvisibleButton("node", Settings::NodeSize);
-
-	if (ImGui::IsItemHovered())
-		hoveredNodeID = node->GetID();
 
 	bool isNodeHovered = false;
 
 	if (_selectedNode == node) 
 		isNodeHovered = true;
-	
-	bool node_moving_active = false;
-	
-	if (ImGui::IsItemActive() /*&& !s_dragNode.con*/)
-		node_moving_active = true;
 
 	ImU32 backgroundColor = Settings::NodeBgColor; 
 	
@@ -194,13 +215,6 @@ void DrawNode(ImDrawList* drawList, Node* node)
 	}
 
 	DrawSlots(drawList, rectMin, node);
-
-	if (node_widgets_active || node_moving_active)
-		_selectedNode = node;
-
-	// Drag node 
-	if (node_moving_active && ImGui::IsMouseDragging(0))
-		node->pos = node->pos + ImGui::GetIO().MouseDelta;
 
 	ImGui::PopID();
 }

@@ -222,16 +222,15 @@ void Application::ShowGraphEditor()
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	
 	//
-	Node* selectedNode = nullptr; 
 
 	// updateDraging(scrollOffset);
 	SetDrawingOffset(scrollOffset);
+	Node* selectedNode = GetHoveredNode(_graph); 
 	SetSelectedNode(selectedNode);
+
+
 	DrawLinks(drawList, _graph);
-	
-	auto nodes = _graph.GetNodeData();
-	for (Node * node : nodes)
-		DrawNode(drawList, node);
+	DrawNodes(drawList, _graph);
 
 	// Open context menu
 	bool open_context_menu = false;
