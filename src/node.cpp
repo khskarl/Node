@@ -38,6 +38,15 @@ struct NodeType gNodeTypes[] =
 };
 
 // SLOT
+Slot::Slot(){
+
+}
+
+Slot::Slot(ImVec2 pPos, bool pIsOutput){
+	pos = pPos;
+	_isOutput = pIsOutput;
+}
+
 ImVec2 Slot::GetPos(){
 	return pos;
 }
@@ -50,6 +59,10 @@ void Slot::SetPos(ImVec2 pPos){
 	pos = pPos;
 }
 
+const bool Slot::IsOutput() {
+	return _isOutput;
+}
+
 // NODE
 static const unsigned GetUniqueNodeID() {
 	static unsigned uid = 0;
@@ -57,15 +70,7 @@ static const unsigned GetUniqueNodeID() {
 }
 
 void Node::SetupSlots(NodeType pType) {
-	// for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
-	// {
-	// }
 	// Create slots
-	// for (DataType slotDataType : pType.inputSlots)
-	// {		
-	// 	if (!slotDataType)
-	// 		continue;
-	// }
 	for (unsigned i = 0; i < pType.numInputs; ++i)
 	{
 		Slot * slot = new Slot;
@@ -88,11 +93,12 @@ void Node::SetupSlots(NodeType pType) {
 
 	// Setup output slot
 	{
-		Slot * slot = new Slot;
+		ImVec2 pos = ImVec2(Settings::NodeSize.y,
+							Settings::NodeSize.y / 2.f);
+
+		Slot * slot = new Slot(pos, true);
 		slot->parent = this;
 		slot->dataType = pType.outputSlot;
-		slot->pos = ImVec2(Settings::NodeSize.y, 
-						   Settings::NodeSize.y / 2.f);
 
 		output = slot;
 	}

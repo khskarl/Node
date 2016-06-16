@@ -11,15 +11,6 @@ using std::cout;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-enum DragState 
-{
-	Default,
-	Hover,
-	BeginDrag,
-	Draging,
-	Connect,
-};
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct StructDragNode
@@ -29,7 +20,6 @@ struct StructDragNode
 };
 
 static StructDragNode s_dragNode;
-static DragState s_dragState = DragState::Default;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -188,6 +178,65 @@ void Application::Init() {
 	_graph.AddLink(from, to);
 }
 
+void Application::UpdateGraphInteraction(ImDrawList* drawList) {
+	
+	Slot* hoveredSlot = GetHoveredSlot(_graph);
+	SetHoveredSlot(hoveredSlot);
+	Node* hoveredNode = GetHoveredNode(_graph); 
+	SetHoveredNode(hoveredNode);
+
+
+	static Slot* otherSlot = nullptr;
+
+	switch(_linkDragState) {
+	case LinkDragState::Idle:
+		if (hoveredSlot != nullptr)
+			_linkDragState = LinkDragState::HoveringSlot;
+
+		ImGui::Text("A");
+		break;
+	case LinkDragState::HoveringSlot:
+		if (ImGui::IsMouseClicked(0) == true && hoveredSlot) {
+			otherSlot = hoveredSlot;
+			if (otherSlot->IsOutput())
+				_linkDragState = LinkDragState::DragingInputLink;
+			else					
+				_linkDragState = LinkDragState::DragingOutputLink;
+		}
+		else if (hoveredSlot == nullptr)
+			_linkDragState = LinkDragState::Idle;
+	
+		ImGui::Text("B");
+		break;
+	case LinkDragState::DragingInputLink:
+		if (ImGui::IsMouseReleased(0))
+			_linkDragState = LinkDragState::Idle;
+
+		DrawHermite(drawList, 
+					otherSlot->GetWorldPos(), 
+					ImGui::GetIO().MousePos);
+		
+		ImGui::Text("C");
+		break;
+	case LinkDragState::DragingOutputLink:
+		if (ImGui::IsMouseReleased(0))			
+			_linkDragState = LinkDragState::Idle;
+		
+		DrawHermite(drawList,  
+					ImGui::GetIO().MousePos,
+					otherSlot->GetWorldPos());
+		
+		ImGui::Text("D");
+		break;
+
+	}
+
+	
+	if (ImGui::IsMouseDown(0) && hoveredNode && hoveredSlot == nullptr) {
+		DragNode(hoveredNode);
+	}
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -217,19 +266,16 @@ void Application::ShowGraphEditor()
 	ImGui::PushItemWidth(120.0f);
 
 	////////////////////
-
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	
 	// updateDraging(graphOffset);
-	SetDrawingOffset(graphOffset);
-	Slot* hoveredSlot = GetHoveredSlot(_graph);
-	//SetHoveredSlot(hoveredSlot);
-	Node* hoveredNode = GetHoveredNode(_graph); 
-	SetHoveredNode(hoveredNode);
-	if (ImGui::IsMouseDown(0) && hoveredNode != nullptr) {
-		DragNode(hoveredNode);
-	}
 
+	// Gotta set this to fix the position inside "graph_drawing_utils"
+	// so it will take into consideration the offset
+	SetDrawingOffset(graphOffset); 
+
+	ImDrawList* drawList = ImGui::GetWindowDrawList();
+	UpdateGraphInteraction(drawList);
+	
 	DrawLinks(drawList, _graph);
 	DrawNodes(drawList, _graph);
 
@@ -237,7 +283,9 @@ void Application::ShowGraphEditor()
 
 	// Open context menu
 	bool open_context_menu = false;
-	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseHoveringWindow() && ImGui::IsMouseClicked(1))
+	if (ImGui::IsAnyItemHovered() && 
+		ImGui::IsMouseHoveringWindow() && 
+		ImGui::IsMouseClicked(1))
 	{
 		node_hovered_in_list = node_hovered_in_scene = -1;
 		open_context_menu = true;
@@ -271,8 +319,11 @@ void Application::ShowGraphEditor()
 	}
 
 	// Scrolling
-	if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(2, 0.0f))
+	if (ImGui::IsWindowHovered() && 
+		ImGui::IsAnyItemActive() == false && 
+		ImGui::IsMouseDragging(2, 0.0f))
 		graphOffset = graphOffset + ImGui::GetIO().MouseDelta;
+		// graphOffset = graphOffset + ImGui::GetMouseDragDelta(2);
 
 	ImGui::PopItemWidth();
 	ImGui::EndChild();

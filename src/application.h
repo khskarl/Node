@@ -8,12 +8,27 @@
 #include "imgui_dock.h"
 #include "graph.h"
 
+
+enum LinkDragState 
+{
+	Idle,
+	HoveringSlot,
+	DragingInputLink,
+	DragingOutputLink,
+};
+
 class Application {
 private:
-	bool _isGraphEditorOpen;
-	void ShowGraphEditor();
 	ImVec2 graphOffset;
 	Graph _graph;
+
+	LinkDragState _linkDragState = LinkDragState::Idle;
+
+	bool _isGraphEditorOpen;
+	
+	void UpdateGraphInteraction(ImDrawList* drawList);
+	void ShowGraphEditor();
+	
 public:
 	Application();
 	void Init();

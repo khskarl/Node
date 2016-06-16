@@ -7,6 +7,7 @@
 
 static ImVec2 _graphOffset = ImVec2(0, 0);
 static Node* _hoveredNode = nullptr;
+static Slot* _hoveredSlot = nullptr;
 
 void SetDrawingOffset(ImVec2 offset) {
 	_graphOffset = offset;
@@ -14,6 +15,10 @@ void SetDrawingOffset(ImVec2 offset) {
 
 void SetHoveredNode(Node* pHoveredNode) {
 	_hoveredNode = pHoveredNode;
+}
+
+void SetHoveredSlot(Slot* pHoveredSlot) {
+	_hoveredSlot = pHoveredSlot;
 }
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)

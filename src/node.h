@@ -15,13 +15,18 @@ enum DataType
 
 class Slot {
 public:
+	Slot();
+	Slot(ImVec2 pPos, bool pIsOutput = false);
 	ImVec2 GetPos();
 	ImVec2 GetWorldPos();
 	void SetPos(ImVec2 pPos);
+	const bool IsOutput();
 public:
 	Node* parent;
 	ImVec2 pos;
 	DataType dataType;
+private:
+	bool _isOutput = false;
 };
 
 struct NodeType

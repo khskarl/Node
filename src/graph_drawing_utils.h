@@ -8,6 +8,7 @@
 void DragNode(Node* node);
 void SetDrawingOffset(ImVec2 offset);
 void SetHoveredNode(Node* pHoveredNode);
+void SetHoveredSlot(Slot* pHoveredSlot);
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2);
 void DrawLinks(ImDrawList* drawList, Graph& graph);
 void DrawNode(ImDrawList* drawList, Node* node);
