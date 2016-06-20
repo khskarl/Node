@@ -6,7 +6,7 @@ uniform sampler2D inputTex;
 
 void main()
 {
-	float x = texCoords.x + sin(texCoords.y);
-	float y = texCoords.y + sin(texCoords.x);
+	float x = texCoords.x;
+	float y = texCoords.y + sin(texCoords.x * 50) * 0.05f;
 	color = texture(inputTex, vec2(x, y)).xyz;
 }
