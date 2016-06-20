@@ -15,7 +15,7 @@ void Graph::AddLink(Slot* fromSlot, Slot* toSlot) {
 	Node* toNode = toSlot->parent;
 
 	toNode->inputTexID = fromNode->texID;
-	toNode->ComputeOutput();
+	ComputeChildren(toNode);
 }
 
 const unsigned Graph::GetNumNodes() {
@@ -30,6 +30,15 @@ std::vector<Link*>& Graph::GetLinkData() {
 	return _links;
 }
 
-void Graph::ComputeHierarchy(Node * target) {
+void Graph::ComputeChildren(Node * target) {
 	target->ComputeOutput();
+
+	for(Link* link : _links) {
+		Node* fromNode = link->from->parent;
+		if (target == fromNode) {
+			Node* toNode = link->to->parent;
+			ComputeChildren(toNode);
+		}
+	
+	}
 }

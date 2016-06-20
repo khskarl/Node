@@ -29,7 +29,7 @@ public:
 	const unsigned GetNumNodes();
 	const unsigned GetNumLinks();
 
-	void ComputeHierarchy(Node * target);
+	void ComputeChildren(Node * target);
 
 private:
 	std::vector<Node*> _nodes;

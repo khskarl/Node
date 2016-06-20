@@ -7,10 +7,10 @@ void main()
 	float x = abs(texCoords.x - 0.5f);
 	float y = abs(texCoords.y - 0.5f);
 	float d = sqrt(x * x + y * y); 
-	if (d > 0.5f)
+	if (d > 0.4f)
 		d = 0;
-	else
+	else {
 		d = 1;
+	}
 	color = vec3(d, d, d);
-	//color = vec3(1, 0, 0);
 }

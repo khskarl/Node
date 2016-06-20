@@ -10,7 +10,6 @@ static const char* _paths[] =
 	"shaders/uv.glsl",
 	"shaders/vertical_waves.glsl",
 	"shaders/horizontal_waves.glsl",
-	"shaders/blend.glsl",
 	"shaders/threshold.glsl",
 };
 

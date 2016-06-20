@@ -183,30 +183,29 @@ void Application::ShowGraphEditor()
 	if (ImGui::IsMouseClicked(2) && hoveredNode != nullptr)
 	{
 		std::cout << "LOL\n";
-		_graph.ComputeHierarchy(hoveredNode);
+		_graph.ComputeChildren(hoveredNode);
 	}
 
 	if (openContextMenu)
 	{
 		ImGui::OpenPopup("context_menu");
-	}
 
+	}
 	// Draw context menu
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
 		if (ImGui::BeginPopup("context_menu"))
 		{	
+			for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
 			{
-				for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
+				if (ImGui::MenuItem(gNodeTypes[i].name))
 				{
-					if (ImGui::MenuItem(gNodeTypes[i].name))
-					{
-						ImVec2 nodePos = ImGui::GetIO().MousePos - graphOffset;
-						_graph.AddNode(nodePos, gNodeTypes[i], i);
-					}
+					ImVec2 nodePos = ImGui::GetIO().MousePos - graphOffset;
+					_graph.AddNode(nodePos, gNodeTypes[i], i);
 				}
+
 			}
-	
+				
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleVar();
