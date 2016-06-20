@@ -23,7 +23,7 @@ void SetHoveredSlot(Slot* pHoveredSlot) {
 
 void DrawHermite(ImDrawList* drawList, ImVec2 p1, ImVec2 p2)
 {
-	int STEPS = 16;
+	int STEPS = 20;
 	ImVec2 t1 = ImVec2(160.0f, 0.0f);
 	ImVec2 t2 = ImVec2(160.0f, 0.0f);
 
