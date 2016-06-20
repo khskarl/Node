@@ -113,13 +113,12 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 		break;
 
 	case LinkDragState::DragingNode:
-		if (ImGui::IsMouseReleased(0)) { 
-			if (hoveredNode != nullptr) {
-			
-			}
-
+		if (ImGui::IsMouseReleased(0) || hoveredNode == nullptr) { 			
 			_linkDragState = LinkDragState::Idle;
 			break;
+		}
+		else if (ImGui::IsMouseDown(0)) {
+			DragNode(hoveredNode);
 		}
 		
 		ImGui::Text("Draging Node");
@@ -130,11 +129,6 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 		break;
 	}
 
-	
-	if (ImGui::IsMouseDown(0) && hoveredNode && hoveredSlot == nullptr) {
-		DragNode(hoveredNode);
-	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,12 +137,6 @@ void Application::ShowGraphEditor()
 {
 	ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Graph Editor", &_isGraphEditorOpen);
-
-	// TODO: Remove/refactor those
-	int node_hovered_in_list = -1;
-	int node_hovered_in_scene = -1;
-
-	// End TODO
 
 	ImGui::SameLine();
 	ImGui::BeginGroup();
@@ -214,12 +202,10 @@ void Application::ShowGraphEditor()
 	}
 
 	// Scrolling
-	if (ImGui::IsWindowHovered() && 
-		ImGui::IsAnyItemActive() == false && 
+	if (ImGui::IsWindowHovered() && ImGui::IsAnyItemActive() == false && 
 		ImGui::IsMouseDragging(2, 0.0f))
 		graphOffset = graphOffset + ImGui::GetIO().MouseDelta;
-		// graphOffset = graphOffset + ImGui::GetMouseDragDelta(2);
-
+	
 	ImGui::PopItemWidth();
 	ImGui::EndChild();
 	ImGui::PopStyleColor();

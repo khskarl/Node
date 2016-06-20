@@ -111,7 +111,7 @@ Node* GetHoveredNode(Graph & graph) {
 		
 		// Compute dimensions of the node
 		ImVec2 rectMin = _graphOffset + node->pos;
-		ImVec2 rectMax = rectMin + Settings::NodeSize;
+		// ImVec2 rectMax = rectMin + Settings::NodeSize;
 
 		// Display node box
 		ImGui::SetCursorScreenPos(rectMin);
@@ -173,12 +173,13 @@ void DrawNode(ImDrawList* drawList, Node* node)
 	if (_hoveredNode == node) 
 		isNodeHovered = true;
 
-	ImU32 backgroundColor = Settings::NodeBgColor; 
+	ImU32 backgroundColor = (Settings::NodeBgColor); 
 	
 	// Draw border of the node
 	{	
-		ImVec2 borderRectMin = rectMin - ImVec2(4, 4);
-		ImVec2 borderRectMax = rectMax + ImVec2(4, 4);
+		float borderSize = 4;
+		ImVec2 borderRectMin = rectMin - ImVec2(borderSize, borderSize);
+		ImVec2 borderRectMax = rectMax + ImVec2(borderSize, borderSize);
 		
 		ImU32 borderColor = Settings::NodeBorderColor;
 		if (isNodeHovered == true)
@@ -189,7 +190,9 @@ void DrawNode(ImDrawList* drawList, Node* node)
 						  		borderColor, 
 						  		4.0f); 
 		// Draw NodeBackground
-		drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f); 
+		drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f);
+//ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& a, const ImVec2& b, const ImVec2& uv0, const ImVec2& uv1, ImU32 col)
+		drawList->AddImage((void*)1, rectMin, rectMax); 
 	}
 
 	// Draw title
@@ -199,7 +202,7 @@ void DrawNode(ImDrawList* drawList, Node* node)
 		titleArea.y = rectMin.y + 25.0f;
 
 		// Draw title background
-		drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40), 4.0f); 
+		drawList->AddRectFilled(rectMin + ImVec2(1,1), titleArea, ImColor(40, 40, 40, 100), 4.0f); 
 
 		ImVec2 pos = rectMin + Settings::NodeWindowPadding;
 		pos.x = rectMin.x + (Settings::NodeSize.x / 2) - textSize.x / 2;
