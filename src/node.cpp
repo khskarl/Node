@@ -1,5 +1,6 @@
 #include "node.h"
 #include "settings.h"
+
 struct NodeType gNodeTypes[] =
 {
 	{

@@ -191,7 +191,6 @@ void DrawNode(ImDrawList* drawList, Node* node)
 						  		4.0f); 
 		// Draw NodeBackground
 		drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f);
-//ImDrawList::AddImage(ImTextureID user_texture_id, const ImVec2& a, const ImVec2& b, const ImVec2& uv0, const ImVec2& uv1, ImU32 col)
 		drawList->AddImage((void*)1, rectMin, rectMax); 
 	}
 

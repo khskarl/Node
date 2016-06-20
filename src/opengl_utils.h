@@ -1,0 +1,4 @@
+#ifndef OPENGL_UTILS_H
+#define OPENGL_UTILS_H
+
+#endif // OPENGL_UTILS_H
