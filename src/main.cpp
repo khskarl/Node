@@ -9,6 +9,8 @@
 #include <imgui.h>
 #include "imgui_impl_glfw_gl3.h"
 
+#include "opengl_utils.h"
+
 #include "application.h"
 
 static void error_callback(int error, const char* description)
@@ -34,6 +36,8 @@ int main(int, char**)
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "Node", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	gl3wInit();
+
+	LoadAllShaders();	
 
 	// Setup ImGui binding
 	ImGui_ImplGlfwGL3_Init(window, true);

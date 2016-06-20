@@ -1,7 +1,7 @@
 
 EXE = node.out
 OBJS = src/main.o src/application.o src/graph_drawing_utils.o src/opengl_utils.o
-OBJS += src/graph.o src/node.o 
+OBJS += src/graph.o src/node.o src/GLshader.o 
 OBJS += src/imgui_impl_glfw_gl3.o src/imgui_dock.o 
 OBJS += ./external/imgui/imgui.o ./external/imgui/imgui_demo.o ./external/imgui/imgui_draw.o
 OBJS += ./external/gl3w/GL/gl3w.o
@@ -43,7 +43,7 @@ endif
 	$(CXX) $(CXXFLAGS) -g -c -o $@ $<
 
 all: $(EXE)
-	@echo Build complete for $(ECHO_MESSAGE)
+	@echo [Build complete for $(ECHO_MESSAGE)]
 
 $(EXE): $(OBJS)
 	$(CXX) -g -o $(EXE) $(OBJS) $(CXXFLAGS) $(LIBS)

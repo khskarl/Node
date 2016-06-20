@@ -4,6 +4,15 @@
 struct NodeType gNodeTypes[] =
 {
 	{
+		"Circle",
+		// Input connections
+		{			
+		},
+		// Output
+		DataType::Color,
+		0,
+	},
+	{
 		"Blend",
 		// Input connections
 		{
@@ -17,17 +26,6 @@ struct NodeType gNodeTypes[] =
 
 	{
 		"Threshold",
-		// Input connections
-		{
-			DataType::Color,
-		},
-		// Output
-		DataType::Color,
-		1,
-	},
-
-	{
-		"2D Transform",
 		// Input connections
 		{
 			DataType::Color,
