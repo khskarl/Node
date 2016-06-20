@@ -13,8 +13,10 @@ enum LinkDragState
 {
 	Idle,
 	HoveringSlot,
+	HoveringNode,
 	DragingInputLink,
 	DragingOutputLink,
+	DragingNode,
 };
 
 class Application {

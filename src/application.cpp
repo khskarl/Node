@@ -35,10 +35,13 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 
 	switch(_linkDragState) {
 	case LinkDragState::Idle:
-		if (hoveredSlot != nullptr)
+		if (hoveredNode != nullptr)
+			_linkDragState = LinkDragState::HoveringNode;
+
+		if (hoveredSlot != nullptr) 
 			_linkDragState = LinkDragState::HoveringSlot;
 
-		ImGui::Text("A");
+		ImGui::Text("Idle");
 		break;
 
 	case LinkDragState::HoveringSlot:
@@ -56,7 +59,21 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 				_linkDragState = LinkDragState::DragingOutputLink;
 		}
 	
-		ImGui::Text("B");
+		ImGui::Text("Hovering Slot");
+		break;
+
+	case LinkDragState::HoveringNode:
+		if (hoveredNode == nullptr) {
+			_linkDragState = LinkDragState::Idle;
+			break;
+		}
+
+		if (ImGui::IsMouseClicked(0) == true) 
+		{
+			_linkDragState = LinkDragState::DragingNode;
+		}
+	
+		ImGui::Text("Hovering Node");
 		break;
 
 	case LinkDragState::DragingInputLink:
@@ -73,7 +90,7 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 					otherSlot->GetWorldPos(), 
 					ImGui::GetIO().MousePos);
 		
-		ImGui::Text("C");
+		ImGui::Text("Draging Input Link");
 		break;
 
 	case LinkDragState::DragingOutputLink:
@@ -90,9 +107,23 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 					ImGui::GetIO().MousePos,
 					otherSlot->GetWorldPos());
 		
-		ImGui::Text("D");
+		ImGui::Text("Draging Output Link");
 		break;
 
+	case LinkDragState::DragingNode:
+		if (ImGui::IsMouseReleased(0)) { 
+			if (hoveredNode != nullptr) {
+			}
+
+			_linkDragState = LinkDragState::Idle;
+			break;
+		}
+		
+		ImGui::Text("Draging Node");
+		break;
+	default:
+		_linkDragState = LinkDragState::Idle;
+		break;
 	}
 
 	
@@ -173,7 +204,8 @@ void Application::ShowGraphEditor()
 			{
 				if (ImGui::MenuItem(gNodeTypes[i].name))
 				{
-					_graph.AddNode(ImGui::GetIO().MousePos - graphOffset, gNodeTypes[i]);
+					ImVec2 nodePos = ImGui::GetIO().MousePos - graphOffset;
+					_graph.AddNode(nodePos, gNodeTypes[i]);
 				}
 			}
 	
