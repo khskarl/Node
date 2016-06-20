@@ -14,21 +14,21 @@ Application::Application() {
 }
 
 void Application::Init() {
-	_graph.AddNode(ImVec2(100, 200), gNodeTypes[0]);
-	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1]);
-	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2]);
+	_graph.AddNode(ImVec2(100, 200), gNodeTypes[0], 0);
+	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1], 1);
+	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2], 2);
 
-	// Slot* from = _graph.GetNodeData()[0]->output;
-	// Slot* to   = _graph.GetNodeData()[1]->inputs[0];
-	// _graph.AddLink(from, to);
+	Slot* from = _graph.GetNodeData()[0]->output;
+	Slot* to   = _graph.GetNodeData()[1]->inputs[0];
+	_graph.AddLink(from, to);
 
 }
 
 void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 
-	Slot* hoveredSlot = GetHoveredSlot(_graph);
+	hoveredSlot = GetHoveredSlot(_graph);
 	SetHoveredSlot(hoveredSlot);
-	Node* hoveredNode = GetHoveredNode(_graph); 
+	hoveredNode = GetHoveredNode(_graph); 
 	SetHoveredNode(hoveredNode);
 
 	ImGui::SetCursorScreenPos(ImGui::GetWindowPos());
@@ -171,10 +171,18 @@ void Application::ShowGraphEditor()
 
 	// Open context menu
 	bool openContextMenu = false;
-	if (ImGui::IsAnyItemHovered() == false && ImGui::IsMouseHoveringWindow() && 
+	bool itemHovered = ImGui::IsAnyItemHovered();
+	if (ImGui::IsMouseHoveringWindow() && 
 		ImGui::IsMouseClicked(1))
 	{
 		openContextMenu = true;
+	}
+
+
+	if (ImGui::IsMouseClicked(2) && hoveredNode != nullptr)
+	{
+		std::cout << "LOL\n";
+		_graph.ComputeHierarchy(hoveredNode);
 	}
 
 	if (openContextMenu)
@@ -187,12 +195,14 @@ void Application::ShowGraphEditor()
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
 		if (ImGui::BeginPopup("context_menu"))
 		{	
-			for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
 			{
-				if (ImGui::MenuItem(gNodeTypes[i].name))
+				for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
 				{
-					ImVec2 nodePos = ImGui::GetIO().MousePos - graphOffset;
-					_graph.AddNode(nodePos, gNodeTypes[i]);
+					if (ImGui::MenuItem(gNodeTypes[i].name))
+					{
+						ImVec2 nodePos = ImGui::GetIO().MousePos - graphOffset;
+						_graph.AddNode(nodePos, gNodeTypes[i], i);
+					}
 				}
 			}
 	

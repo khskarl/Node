@@ -70,7 +70,10 @@ static const unsigned GetUniqueNodeID() {
 }
 
 void Node::ComputeOutput() {
-	DrawFramebuffer(fboID, 1);
+	if (inputs.size() > 0)
+		DrawFramebuffer(fboID, programID, inputTexID);
+	else
+		DrawFramebuffer(fboID, programID);
 }
 
 void Node::SetupSlots(NodeType pType) {
@@ -110,13 +113,14 @@ void Node::SetupSlots(NodeType pType) {
 
 }
 
-Node::Node(ImVec2 pPos, NodeType pType) {
+Node::Node(ImVec2 pPos, NodeType pType, unsigned temp) {
 	_id = GetUniqueNodeID();
 	pos = pPos;
 	name = pType.name;
-	fboID = CreateFramebuffer();
 	
 	this->SetupSlots(pType);
+	fboID = CreateFramebuffer(texID);
+	programID = temp;
 	ComputeOutput();
 }
 

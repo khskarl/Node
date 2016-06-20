@@ -52,8 +52,11 @@ public:
 	Slot* output;
 
 	unsigned fboID = 0; // OpenGL blablabla
+	unsigned programID = 0;
+	unsigned texID = 0;
+	unsigned inputTexID = 0;
 
-	Node(ImVec2 pPos, NodeType pType);
+	Node(ImVec2 pPos, NodeType pType, unsigned temp);
 	const unsigned GetID();
 	ImVec2 GetPos();
 	ImVec2 GetWorldPos();

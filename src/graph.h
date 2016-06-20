@@ -21,13 +21,15 @@ struct Link {
 
 class Graph {
 public:
-	void AddNode(ImVec2 pPos, NodeType pType);
+	void AddNode(ImVec2 pPos, NodeType pType, unsigned temp);
 	void AddLink(Slot* fromSlot, Slot* toSlot);
 
 	std::vector<Node*>& GetNodeData();
 	std::vector<Link*>& GetLinkData();
 	const unsigned GetNumNodes();
 	const unsigned GetNumLinks();
+
+	void ComputeHierarchy(Node * target);
 
 private:
 	std::vector<Node*> _nodes;

@@ -5,7 +5,7 @@
 
 bool LoadAllShaders();
 unsigned GetProgram(unsigned index);
-unsigned CreateFramebuffer();
-void DrawFramebuffer(unsigned fboID, unsigned program);
+unsigned CreateFramebuffer(unsigned &texID);
+void DrawFramebuffer(unsigned fboID, unsigned program, unsigned inputTex = 0);
 
 #endif // OPENGL_UTILS_H

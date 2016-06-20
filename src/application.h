@@ -23,6 +23,8 @@ class Application {
 private:
 	ImVec2 graphOffset;
 	Graph _graph;
+	Node* hoveredNode;
+	Slot* hoveredSlot;
 
 	LinkDragState _linkDragState = LinkDragState::Idle;
 

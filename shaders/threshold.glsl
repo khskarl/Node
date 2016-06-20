@@ -2,7 +2,9 @@
 in vec2 texCoords;
 out vec3 color;
 
+uniform sampler2D inputTex;
+
 void main()
 {
-	color = vec3(texCoords.x, texCoords.y, 1.0f);
+	color = texture(inputTex, vec2(sin(texCoords.x), texCoords.y)).xyz;
 }

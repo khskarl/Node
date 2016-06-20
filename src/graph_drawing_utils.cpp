@@ -191,7 +191,7 @@ void DrawNode(ImDrawList* drawList, Node* node)
 						  		4.0f); 
 		// Draw NodeBackground
 		drawList->AddRectFilled(rectMin, rectMax, backgroundColor, 4.0f);
-		drawList->AddImage((void*)1, rectMin, rectMax); 
+		drawList->AddImage((void*)node->fboID, rectMin, rectMax); 
 	}
 
 	// Draw title
