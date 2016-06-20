@@ -23,7 +23,8 @@ class Graph {
 public:
 	void AddNode(ImVec2 pPos, NodeType pType, unsigned temp);
 	void AddLink(Slot* fromSlot, Slot* toSlot);
-
+	void RemoveNode(Node * node);
+	
 	std::vector<Node*>& GetNodeData();
 	std::vector<Link*>& GetLinkData();
 	const unsigned GetNumNodes();

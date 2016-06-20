@@ -172,7 +172,10 @@ void Application::ShowGraphEditor()
 
 	// Open context menu
 	bool openContextMenu = false;
+	bool openNodeCreationMenu = false;
+	bool openNodeMenu = false;
 	bool itemHovered = ImGui::IsAnyItemHovered();
+
 	if (ImGui::IsMouseHoveringWindow() && 
 		ImGui::IsMouseClicked(1))
 	{
@@ -182,19 +185,30 @@ void Application::ShowGraphEditor()
 
 	if (ImGui::IsMouseClicked(2) && hoveredNode != nullptr)
 	{
-		std::cout << "LOL\n";
+		// std::cout << "LOL\n";
 		_graph.ComputeChildren(hoveredNode);
 	}
 
-	if (openContextMenu)
-	{
-		ImGui::OpenPopup("context_menu");
+	if (openContextMenu && hoveredNode == nullptr) {
+		openNodeCreationMenu = true;
+	} 
+	else if (openContextMenu && hoveredNode != nullptr) {
+		openNodeMenu = true;
+	}
 
+	if (openNodeCreationMenu)
+	{
+		ImGui::OpenPopup("node_creation_menu");
+	}
+	else if (openNodeMenu) 
+	{
+		selectedNode = hoveredNode;
+		ImGui::OpenPopup("node_menu");
 	}
 	// Draw context menu
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8,8));
-		if (ImGui::BeginPopup("context_menu"))
+		if (ImGui::BeginPopup("node_creation_menu"))
 		{	
 			for (int i = 0; i < (int)sizeofArray(gNodeTypes); ++i)
 			{
@@ -206,6 +220,20 @@ void Application::ShowGraphEditor()
 
 			}
 				
+			ImGui::EndPopup();
+		}
+		if (ImGui::BeginPopup("node_menu"))
+		{	
+			if (ImGui::MenuItem("Delete node"))
+			{
+				_graph.RemoveNode(selectedNode);
+			}
+
+			if (ImGui::MenuItem("Set as output"))
+			{
+				
+			}
+			
 			ImGui::EndPopup();
 		}
 		ImGui::PopStyleVar();
@@ -227,4 +255,5 @@ void Application::ShowGraphEditor()
 
 void Application::Show() {
 	this->ShowGraphEditor();
+	// this->ShowOutputWindow();
 }

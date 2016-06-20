@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <iostream>
 
 void Graph::AddNode(ImVec2 pPos, NodeType pType, unsigned temp) {
 	Node* node = new Node(pPos, pType, temp);
@@ -16,6 +17,26 @@ void Graph::AddLink(Slot* fromSlot, Slot* toSlot) {
 
 	toNode->inputTexID = fromNode->texID;
 	ComputeChildren(toNode);
+}
+
+void Graph::RemoveNode(Node * target) {
+	std::cout << "A\n";
+	for(auto it = _links.begin(); it != _links.end(); it++) {
+		Node* fromNode = (*it)->from->parent;
+		Node* toNode = (*it)->to->parent;
+
+		if (target == fromNode || target == toNode)
+			_links.erase(it);
+	}
+	std::cout << "C\n";
+	for(auto it = _nodes.begin(); it != _nodes.end(); it++) {
+		if (target == *it)
+			_nodes.erase(it);
+	}
+
+	std::cout << "D\n";
+
+
 }
 
 const unsigned Graph::GetNumNodes() {
@@ -38,7 +59,6 @@ void Graph::ComputeChildren(Node * target) {
 		if (target == fromNode) {
 			Node* toNode = link->to->parent;
 			ComputeChildren(toNode);
-		}
-	
+		}	
 	}
 }
