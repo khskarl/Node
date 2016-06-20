@@ -30,6 +30,7 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 	Node* hoveredNode = GetHoveredNode(_graph); 
 	SetHoveredNode(hoveredNode);
 
+	ImGui::SetCursorScreenPos(ImGui::GetWindowPos());
 
 	static Slot* otherSlot = nullptr;
 
@@ -87,7 +88,7 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 		}
 
 		DrawHermite(drawList, 
-					otherSlot->GetWorldPos(), 
+					otherSlot->GetWorldPos() + ImGui::GetWindowPos(), 
 					ImGui::GetIO().MousePos);
 		
 		ImGui::Text("Draging Input Link");
@@ -105,7 +106,7 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 		
 		DrawHermite(drawList,  
 					ImGui::GetIO().MousePos,
-					otherSlot->GetWorldPos());
+					otherSlot->GetWorldPos() + ImGui::GetWindowPos());
 		
 		ImGui::Text("Draging Output Link");
 		break;
@@ -113,6 +114,7 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 	case LinkDragState::DragingNode:
 		if (ImGui::IsMouseReleased(0)) { 
 			if (hoveredNode != nullptr) {
+			
 			}
 
 			_linkDragState = LinkDragState::Idle;
@@ -121,6 +123,7 @@ void Application::UpdateGraphInteraction(ImDrawList* drawList) {
 		
 		ImGui::Text("Draging Node");
 		break;
+
 	default:
 		_linkDragState = LinkDragState::Idle;
 		break;
@@ -166,7 +169,7 @@ void Application::ShowGraphEditor()
 
 	// Gotta set this to fix the position inside "graph_drawing_utils"
 	// so it will take into consideration the offset
-	SetDrawingOffset(graphOffset); 
+	SetDrawingOffset(graphOffset + ImGui::GetWindowPos()); 
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	UpdateGraphInteraction(drawList);
