@@ -15,6 +15,7 @@ void Graph::AddLink(Slot* fromSlot, Slot* toSlot) {
 	Node* toNode = toSlot->parent;
 
 	toNode->inputTexID = fromNode->texID;
+	toNode->ComputeOutput();
 }
 
 const unsigned Graph::GetNumNodes() {

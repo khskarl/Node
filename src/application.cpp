@@ -17,9 +17,10 @@ void Application::Init() {
 	_graph.AddNode(ImVec2(100, 200), gNodeTypes[0], 0);
 	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1], 1);
 	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2], 2);
+	_graph.AddNode(ImVec2(400, 300), gNodeTypes[3], 3);
 
 	Slot* from = _graph.GetNodeData()[0]->output;
-	Slot* to   = _graph.GetNodeData()[1]->inputs[0];
+	Slot* to   = _graph.GetNodeData()[2]->inputs[0];
 	_graph.AddLink(from, to);
 
 }

@@ -14,15 +14,33 @@ struct NodeType gNodeTypes[] =
 		0,
 	},
 	{
-		"Blend",
+		"UV",
+		// Input connections
+		{			
+		},
+		// Output
+		DataType::Color,
+		0,
+	},
+	{
+		"Vertical Waves",
 		// Input connections
 		{
-			DataType::Color,
 			DataType::Color,
 		},
 		// Output
 		DataType::Color,
-		2,
+		1,
+	},
+	{
+		"Horizontal Waves",
+		// Input connections
+		{
+			DataType::Color,
+		},
+		// Output
+		DataType::Color,
+		1,
 	},
 
 	{

@@ -208,6 +208,8 @@ void DrawNode(ImDrawList* drawList, Node* node)
 
 		ImGui::SetCursorScreenPos(pos);
 		ImGui::Text("%s", node->name);
+		ImGui::Text("%u", node->texID);
+		ImGui::Text("%u", node->inputTexID);
 	}
 
 	DrawSlots(drawList, rectMin, node);

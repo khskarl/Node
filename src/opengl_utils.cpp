@@ -7,12 +7,18 @@
 static const char* _paths[] = 
 {
 	"shaders/circle.glsl",
+	"shaders/uv.glsl",
+	"shaders/vertical_waves.glsl",
+	"shaders/horizontal_waves.glsl",
 	"shaders/blend.glsl",
 	"shaders/threshold.glsl",
 };
 
 static unsigned _programs[] = 
 {
+	0,
+	0,
+	0,
 	0,
 	0,
 	0,
@@ -45,7 +51,7 @@ bool LoadAllShaders() {
 
 	unsigned i = 0;
 	for(const char* shaderPath : _paths) {
-		std::cout << shaderPath << "\n";
+		// std::cout << shaderPath << "\n";
 		GLuint program = LoadShader("shaders/passVS.glsl", shaderPath);
 
 		if (program == 0) {
@@ -55,7 +61,7 @@ bool LoadAllShaders() {
 
 		_programs[i++] = program;
 
-		std::cout << "ID: " << program << "\n";
+		// std::cout << "ID: " << program << "\n";
 		glUseProgram(program);
 	}
 
@@ -135,7 +141,7 @@ unsigned CreateFramebuffer(unsigned &texID) {
 
 void DrawFramebuffer(unsigned fboID, unsigned program, unsigned inputTex) {
 	program = _programs[program];
-	std::cout << program << " LALAL \n";
+	// std::cout << program << " LALAL \n";
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 	glViewport(0, 0, 512, 512); 
@@ -151,8 +157,8 @@ void DrawFramebuffer(unsigned fboID, unsigned program, unsigned inputTex) {
 	if (inputTex != 0) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, inputTex);
-		// Set our "renderedTexture" sampler to user Texture Unit 0
-		glUniform1i(fboID, 0);
+		glUniform1i(inputTex, 0);
+		std::cout << "inputTex: " << inputTex << "\n";
 	}
 
 	// 1rst attribute buffer : vertices
