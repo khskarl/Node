@@ -57,6 +57,7 @@ public:
 	const unsigned GetID();
 	ImVec2 GetPos();
 	ImVec2 GetWorldPos();
+	void ComputeOutput();
 
 private:
 	unsigned _id;

@@ -68,6 +68,10 @@ static const unsigned GetUniqueNodeID() {
 	return uid++;
 }
 
+void Node::ComputeOutput() {
+	
+}
+
 void Node::SetupSlots(NodeType pType) {
 	// Create slots
 	for (unsigned i = 0; i < pType.numInputs; ++i)

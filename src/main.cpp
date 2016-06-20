@@ -19,7 +19,7 @@ static void error_callback(int error, const char* description)
 }
 
 
-ImVec4 gClearColor = ImColor(85, 101, 107);
+ImVec4 gClearColor = ImColor(23, 20, 20);
 
 int main(int, char**)
 {
@@ -53,7 +53,8 @@ int main(int, char**)
 
 		// ShowApplication();
 		app.Show();
-
+		
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		// Rendering
 		int displayW, displayH;
 		glfwGetFramebufferSize(window, &displayW, &displayH);
@@ -63,6 +64,7 @@ int main(int, char**)
 					 gClearColor.z, 
 					 gClearColor.w);
 		glClear(GL_COLOR_BUFFER_BIT);
+
 		ImGui::Render();
 		glfwSwapBuffers(window);
 	}

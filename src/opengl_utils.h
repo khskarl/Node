@@ -5,5 +5,6 @@
 
 bool LoadAllShaders();
 unsigned GetProgram(unsigned index);
+unsigned CreateFramebuffer();
 
 #endif // OPENGL_UTILS_H
