@@ -17,14 +17,15 @@ void Application::Init() {
 	_graph.AddNode(ImVec2(100, 200), gNodeTypes[0]);
 	_graph.AddNode(ImVec2(600, 200), gNodeTypes[1]);
 	_graph.AddNode(ImVec2(300, 300), gNodeTypes[2]);
-	Slot* from = _graph.GetNodeData()[0]->output;
-	Slot* to   = _graph.GetNodeData()[1]->inputs[0];
 
-	_graph.AddLink(from, to);
+	// Slot* from = _graph.GetNodeData()[0]->output;
+	// Slot* to   = _graph.GetNodeData()[1]->inputs[0];
+	// _graph.AddLink(from, to);
+
 }
 
 void Application::UpdateGraphInteraction(ImDrawList* drawList) {
-	
+
 	Slot* hoveredSlot = GetHoveredSlot(_graph);
 	SetHoveredSlot(hoveredSlot);
 	Node* hoveredNode = GetHoveredNode(_graph); 
@@ -172,6 +173,7 @@ void Application::ShowGraphEditor()
 	SetDrawingOffset(graphOffset + ImGui::GetWindowPos()); 
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
+
 	UpdateGraphInteraction(drawList);
 	
 	DrawLinks(drawList, _graph);
@@ -180,22 +182,16 @@ void Application::ShowGraphEditor()
 	////////////////////
 
 	// Open context menu
-	bool open_context_menu = false;
-	if (ImGui::IsAnyItemHovered() && 
-		ImGui::IsMouseHoveringWindow() && 
+	bool openContextMenu = false;
+	if (ImGui::IsAnyItemHovered() == false && ImGui::IsMouseHoveringWindow() && 
 		ImGui::IsMouseClicked(1))
 	{
-		node_hovered_in_list = node_hovered_in_scene = -1;
-		open_context_menu = true;
+		openContextMenu = true;
 	}
 
-	if (open_context_menu)
+	if (openContextMenu)
 	{
 		ImGui::OpenPopup("context_menu");
-		// if (node_hovered_in_list != -1)
-		// 	node_selected = node_hovered_in_list;
-		// if (node_hovered_in_scene != -1)
-		// 	node_selected = node_hovered_in_scene;
 	}
 
 	// Draw context menu
