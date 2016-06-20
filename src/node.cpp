@@ -1,5 +1,6 @@
 #include "node.h"
 #include "settings.h"
+#include "opengl_utils.h"
 
 struct NodeType gNodeTypes[] =
 {
@@ -69,7 +70,7 @@ static const unsigned GetUniqueNodeID() {
 }
 
 void Node::ComputeOutput() {
-	
+	DrawFramebuffer(fboID, 1);
 }
 
 void Node::SetupSlots(NodeType pType) {
@@ -113,8 +114,10 @@ Node::Node(ImVec2 pPos, NodeType pType) {
 	_id = GetUniqueNodeID();
 	pos = pPos;
 	name = pType.name;
+	fboID = CreateFramebuffer();
 	
 	this->SetupSlots(pType);
+	ComputeOutput();
 }
 
 const unsigned Node::GetID() {

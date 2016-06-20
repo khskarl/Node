@@ -51,7 +51,7 @@ public:
 	std::vector<Slot*> inputs;
 	Slot* output;
 
-	int textureID = -1; // OpenGL blablabla
+	unsigned fboID = 0; // OpenGL blablabla
 
 	Node(ImVec2 pPos, NodeType pType);
 	const unsigned GetID();
