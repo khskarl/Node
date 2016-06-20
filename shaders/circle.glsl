@@ -10,7 +10,7 @@ void main()
 	if (d > 0.4f)
 		d = 0;
 	else {
-		d = 1;
+		// d = 1;
 	}
 	color = vec3(d, d, d);
 }

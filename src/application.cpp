@@ -231,7 +231,7 @@ void Application::ShowGraphEditor()
 
 			if (ImGui::MenuItem("Set as output"))
 			{
-				
+				outputNode = selectedNode;
 			}
 			
 			ImGui::EndPopup();
@@ -253,7 +253,20 @@ void Application::ShowGraphEditor()
 	ImGui::End();
 }
 
+void Application::ShowOutputWindow() {
+	ImGui::SetNextWindowSize(ImVec2(512, 512), ImGuiSetCond_FirstUseEver);
+	ImGui::Begin("Output", &_isOutputWindowOpen);
+
+	// ImGui::SameLine();
+	ImGui::BeginGroup();
+	if (outputNode != nullptr)
+		ImGui::Image((void*)outputNode->fboID, ImVec2(512, 512)); 
+	ImGui::EndGroup();
+
+	ImGui::End();
+}
+
 void Application::Show() {
 	this->ShowGraphEditor();
-	// this->ShowOutputWindow();
+	this->ShowOutputWindow();
 }

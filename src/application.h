@@ -31,9 +31,11 @@ private:
 	LinkDragState _linkDragState = LinkDragState::Idle;
 
 	bool _isGraphEditorOpen;
+	bool _isOutputWindowOpen;
 	
 	void UpdateGraphInteraction(ImDrawList* drawList);
 	void ShowGraphEditor();
+	void ShowOutputWindow();
 	
 public:
 	Application();
