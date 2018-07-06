@@ -1,1 +1,3 @@
 # Node
+
+![Demonstration](demo.gif)
